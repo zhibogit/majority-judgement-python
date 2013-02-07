@@ -7,6 +7,17 @@ class MajorityJudgement:
   def has_remaining_votes(self):
     return len(self.votes) > 0
 
+  def __eq__(self, other):
+    if self is other: return True
+    if len(self) != len(other): return False
+    x = iter(self)
+    y = iter(other)
+    try:
+      while True:
+        if x.next() != y.next(): return False
+    except StopIteration: 
+      return True
+
   def __len__(self):
     return len(self.judgement_trail) + self.votes_remaining
 
