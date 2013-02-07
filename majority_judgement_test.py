@@ -5,6 +5,27 @@ class TestMajorityJudgementSoundness(unittest.TestCase):
     def setUp(self):
       pass
 
+    def test_not_less_than_self(self):
+      def do_test(x):
+        self.assertGreaterEqual(MajorityJudgement(x), MajorityJudgement(x))
+
+      do_test([1,2,3])
+      do_test([10])
+      do_test([10, 1, 10])
+
+    def test_front_loading_moves_earlier(self):
+      def do_test(x):
+        for i in xrange(1, len(x)):
+          y = list(x)
+          y[i] = y[i] - 1
+          y[i-1] = y[i-1] + 1
+          self.assertLess(MajorityJudgement(y), MajorityJudgement(x))
+
+      do_test([1, 1, 1, 1])
+      do_test([2,3])
+      do_test([2,1,3])
+      do_test([10,1,10])
+
     def test_equality_of_same_input(self):
       x = MajorityJudgement([1,2,3])
       self.assertEqual(x, x)

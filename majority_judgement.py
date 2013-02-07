@@ -1,3 +1,6 @@
+from functools import total_ordering
+
+@total_ordering
 class MajorityJudgement:
   def __init__(self, votes):
     self.votes = list(votes)
@@ -6,6 +9,9 @@ class MajorityJudgement:
 
   def has_remaining_votes(self):
     return len(self.votes) > 0
+
+  def __repr__(self):
+    return "MajorityJudgement(%s, %s)" % (self.judgement_trail, self.votes) 
 
   def __eq__(self, other):
     if self is other: return True
@@ -17,6 +23,28 @@ class MajorityJudgement:
         if x.next() != y.next(): return False
     except StopIteration: 
       return True
+
+  def __lt__(self, other):
+    if self is other: return False
+    
+    si = iter(self)
+    oi = iter(other)
+
+    try:
+      while True:
+        try: x = si.next()
+        except StopIteration:
+          try: 
+            oi.next()
+            return True
+          except StopIteration:
+            return False
+      
+        y = oi.next()
+        if x < y: return True
+        if y > x: return False
+    except StopIteration: return False
+
 
   def __len__(self):
     return len(self.judgement_trail) + self.votes_remaining
