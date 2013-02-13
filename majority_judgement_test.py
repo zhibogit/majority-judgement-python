@@ -5,6 +5,17 @@ class TestMajorityJudgementSoundness(unittest.TestCase):
     def setUp(self):
       pass
 
+    def test_tallies(self):
+      def do_test(x):
+        tallies = [0 for _ in x]
+        for i in MajorityJudgement(x): tallies[i] = tallies[i] + 1
+        self.assertEqual(x, tallies)
+
+      do_test([1,2,3])
+      do_test([13])
+      do_test([1, 13, 12, 11, 1])
+
+
     def test_not_less_than_self(self):
       def do_test(x):
         self.assertGreaterEqual(MajorityJudgement(x), MajorityJudgement(x))
