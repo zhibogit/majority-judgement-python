@@ -3,6 +3,7 @@ import pytest
 
 class TestMajorityJudgementSoundness:
     example_votes = [
+      [1,1,1,1,1,1,1,1],
       [1,2,3],
       [13],
       [1, 13, 12, 11, 1],
@@ -24,7 +25,6 @@ class TestMajorityJudgementSoundness:
       tallies = [0 for _ in x]
       for i in MajorityJudgement(x): tallies[i] = tallies[i] + 1
       assert x == tallies
-
 
     @on_all_examples
     def test_not_less_than_self(self, x):
