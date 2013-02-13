@@ -1,9 +1,6 @@
 from majority_judgement import MajorityJudgement
 
 class TestMajorityJudgementSoundness:
-    def setUp(self):
-      pass
-
     def test_tallies(self):
       def do_test(x):
         tallies = [0 for _ in x]
