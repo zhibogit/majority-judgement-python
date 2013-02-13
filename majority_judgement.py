@@ -1,6 +1,3 @@
-from functools import total_ordering
-
-@total_ordering
 class MajorityJudgement:
   def __init__(self, votes):
     self.votes = list(votes)
@@ -13,38 +10,32 @@ class MajorityJudgement:
   def __repr__(self):
     return "MajorityJudgement(%s, %s)" % (self.judgement_trail, self.votes) 
 
-  def __eq__(self, other):
-    if self is other: return True
-    if len(self) != len(other): return False
-    x = iter(self)
-    y = iter(other)
-    try:
-      while True:
-        if x.next() != y.next(): return False
-    except StopIteration: 
-      return True
+  def __eq__(self, other): return self.compare(other) == 0
+  def __ne__(self, other): return self.compare(other) != 0
+  def __lt__(self, other): return self.compare(other) < 0
+  def __le__(self, other): return self.compare(other) <= 0
+  def __gt__(self, other): return self.compare(other) > 0
+  def __ge__(self, other): return self.compare(other) >= 0
 
-  def __lt__(self, other):
+  def compare(self, other):
     if self is other: return False
     
     si = iter(self)
     oi = iter(other)
 
-    try:
-      while True:
-        try: x = si.next()
+    while True:
+      try: x = si.next()
+      except StopIteration:
+        try: 
+          oi.next()
+          return -1
         except StopIteration:
-          try: 
-            oi.next()
-            return True
-          except StopIteration:
-            return False
-      
-        y = oi.next()
-        if x < y: return True
-        if y > x: return False
-    except StopIteration: return False
+          return 0
+      try: y = oi.next()
+      except StopIteration: return 1
 
+      if x < y: return -1
+      if x > y: return 1
 
   def __len__(self):
     return len(self.judgement_trail) + self.votes_remaining
