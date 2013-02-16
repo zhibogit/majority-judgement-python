@@ -79,3 +79,33 @@ class TestMajorityJudgementSoundness:
     ])
     def test_starts_with_median(self, x, m):
       assert MajorityJudgement(x)[0] == m
+
+    @pytest.mark.parametrize(("x", "y", "k"), [(x, y,k) 
+      for x in example_votes 
+      for y in example_votes 
+      if sum(x) == sum(y) and x != y
+      for k in xrange(sum(x) / 2)
+    ])
+    def test_can_drop_outliers(self, x, y, k):
+      assert sum(x) == sum(y)
+      x1 = MajorityJudgement(x)
+      y1 = MajorityJudgement(y)
+
+      def drop_outliers(l, k):
+        l = list(l)
+        for r in [xrange(len(l)), reversed(xrange(len(l)))]:
+          k2 = k
+          for i in r:
+            if l[i] >= k2:
+              l[i] = l[i] - k2
+              break
+            else:
+              k2 = k2 - l[i]
+              l[i] = 0
+        return l
+
+      x2 = MajorityJudgement(drop_outliers(x, k))
+      y2 = MajorityJudgement(drop_outliers(y, k))
+
+      if x1 <= y1: assert x2 <= y2
+      else: assert y2 <= x2
