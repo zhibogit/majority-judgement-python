@@ -35,7 +35,17 @@ class MajorityJudgement:
             if i < n: 
                 return x
             i = i - n
-    
+
+    def __delitem__(self, i):   
+        raise TypeError(
+            "MajorityJudgement objects do not support modifying" 
+            "the contents")
+
+    def __setitem__(self, i, x):
+        raise TypeError(
+            "MajorityJudgement objects do not support modifying" 
+            "the contents")
+ 
     def __iter__(self):
         for (x, n) in self.each_judgement():
             for _ in xrange(n): yield x
