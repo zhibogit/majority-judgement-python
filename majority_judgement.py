@@ -15,7 +15,7 @@ class MajorityJudgement:
   def __ge__(self, other): return self.compare(other) >= 0
 
   def __len__(self):
-    return sum(self.judgement_trail) + self.votes_remaining
+    return sum([n for _, n in self.judgement_trail]) + self.votes_remaining
 
   def __getitem__(self, i):
     if i < 0 or i >= len(self): raise IndexError("Index %d out of range [0, %d)", i, len(self))

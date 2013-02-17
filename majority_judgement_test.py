@@ -60,6 +60,16 @@ class TestMajorityJudgementSoundness:
       assert MajorityJudgement(x) != MajorityJudgement(y)
 
     @on_all_examples
+    def test_length_agrees_with_list(self, x):
+      assert len(MajorityJudgement(x)) == len(list(MajorityJudgement(x)))
+    
+    @on_all_examples
+    def test_length_agrees_with_list_when_evaluated(self, x):
+      x = MajorityJudgement(x)
+      y = list(x)
+      assert len(x) == len(y)
+
+    @on_all_examples
     def test_correct_number(self, x):
       total = sum(x)
       assert len(list(MajorityJudgement(x))) == total
