@@ -1,3 +1,34 @@
+"""
+Majority judgement is a method of voting in which participants assign grades
+to candidates. These grades can be any ordinal values (numbers, "A,B,C", "Good,
+Bad,Terrible", etc. All that matters is the relative ordinal positions of the 
+grades.
+
+In this module we assume that grades are consecutive integer values starting 
+from 0 as the lowest. Any other grades can be trivially converted to this form.
+
+The essential idea of majority judgement is that we sort the grades assigned to
+the candidate in order of most significant to least significant. At any given
+point the most significant grade of those left is the lower median of the set
+(i.e. the highest grade which at least 50% of the population supports).
+
+So for example given the grading Bad, OK, OK, Good we would convert this to the
+sequence
+
+OK, Bad, OK, Good
+
+Another candidate might have the grading
+
+OK, Good, OK, Good
+
+This candidate would win because their second grading is better than the first
+candidate's.
+
+This module provides a type which wraps a tally of grades and is then ordered
+in terms of the majority judgement. It may then be used to implement a voting 
+procedure by assigning each candidate their tally and taking the maximum.
+"""
+
 class MajorityJudgement:
     def __init__(self, votes):
         self.length = sum(votes)
