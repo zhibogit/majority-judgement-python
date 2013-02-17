@@ -241,3 +241,14 @@ class TestMajorityJudgementSoundness:
             MajorityJudgement([1, 2, 3])[6]
         with pytest.raises(IndexError):
             MajorityJudgement([1, 2, 3])[-6]
+
+    @on_all_examples
+    def test_run_length_encoding(self, x):
+        xj = MajorityJudgement(x)
+        last_x = None
+        rlel = 0
+        for v in xj:
+            if last_x != v:
+                last_x = v
+                rlel  = rlel + 1
+        assert len(list(xj._each_judgement())) <= rlel
