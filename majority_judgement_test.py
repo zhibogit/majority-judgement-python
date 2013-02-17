@@ -2,20 +2,21 @@ from majority_judgement import MajorityJudgement
 import pytest
 import re
 
+
 class TestMajorityJudgementSoundness:
     example_votes = [
-        [1,1,1,1,1,1,1,1],
-        [1,2,3],
+        [1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 2, 3],
         [13],
         [1, 13, 12, 11, 1],
         [1, 1, 1, 1],
-        [2,3],
-        [2,1,3],
-        [10,1,10],
-        [1,3,2],
-        [10], 
+        [2, 3],
+        [2, 1, 3],
+        [10, 1, 10],
+        [1, 3, 2],
+        [10],
         [9],
-        [10], 
+        [10],
         [9, 1]
     ]
 
@@ -24,7 +25,8 @@ class TestMajorityJudgementSoundness:
     @on_all_examples
     def test_tallies(self, x):
         tallies = [0 for _ in x]
-        for i in MajorityJudgement(x): tallies[i] = tallies[i] + 1
+        for i in MajorityJudgement(x):
+            tallies[i] = tallies[i] + 1
         assert x == tallies
 
     @on_all_examples
@@ -61,7 +63,7 @@ class TestMajorityJudgementSoundness:
         assert MajorityJudgement(x) == MajorityJudgement(x)
 
     @pytest.mark.parametrize(("x", "y"), [
-        (x, y) for x in example_votes for y in example_votes if x != y 
+        (x, y) for x in example_votes for y in example_votes if x != y
     ])
     def test_inequality_of_different_inputs(self, x, y):
         assert MajorityJudgement(x) != MajorityJudgement(y)
@@ -70,13 +72,13 @@ class TestMajorityJudgementSoundness:
         (x, y) for x in example_votes for y in example_votes
     ])
     def test_anti_symmetry_of_compare(self, x, y):
-        assert MajorityJudgement(x).compare(MajorityJudgement(y)) == -MajorityJudgement(y).compare(MajorityJudgement(x))
-
+        assert (MajorityJudgement(x).compare(MajorityJudgement(y)) ==
+                -MajorityJudgement(y).compare(MajorityJudgement(x)))
 
     @on_all_examples
     def test_length_agrees_with_list(self, x):
         assert len(MajorityJudgement(x)) == len(list(MajorityJudgement(x)))
-    
+
     @on_all_examples
     def test_length_agrees_with_list_when_evaluated(self, x):
         x = MajorityJudgement(x)
@@ -87,8 +89,8 @@ class TestMajorityJudgementSoundness:
     def test_correct_number(self, x):
         total = sum(x)
         assert len(list(MajorityJudgement(x))) == total
-     
-    @on_all_examples 
+
+    @on_all_examples
     def test_positive_index_matches_list_index(self, x):
         y = list(MajorityJudgement(x))
         x = MajorityJudgement(x)
@@ -97,29 +99,29 @@ class TestMajorityJudgementSoundness:
             assert x[i] == y[i]
 
     @on_all_examples
-    def test_negative_index_matches_list_index(self,x):
+    def test_negative_index_matches_list_index(self, x):
         y = list(MajorityJudgement(x))
         x = MajorityJudgement(x)
 
         for i in xrange(len(y)):
             assert x[-i] == y[-i]
 
-
     @pytest.mark.parametrize(("x", "m"), [
-        ([1,1,1,1], 1),
-        ([5,1,1,5], 1),
-        ([5,1,1,6], 2),
-        ([1,1,1,1,20], 4)
+        ([1, 1, 1, 1], 1),
+        ([5, 1, 1, 5], 1),
+        ([5, 1, 1, 6], 2),
+        ([1, 1, 1, 1, 20], 4)
     ])
     def test_starts_with_median(self, x, m):
         assert MajorityJudgement(x)[0] == m
 
-    @pytest.mark.parametrize(("x", "y", "k"), [(x, y,k) 
-        for x in example_votes 
-        for y in example_votes 
-        if sum(x) == sum(y) and x != y
-        for k in xrange(sum(x) / 2)
-    ])
+    @pytest.mark.parametrize(
+        ("x", "y", "k"),
+        [(x, y, k)
+            for x in example_votes
+            for y in example_votes
+            if sum(x) == sum(y) and x != y
+            for k in xrange(sum(x) / 2)])
     def test_can_drop_outliers(self, x, y, k):
         assert sum(x) == sum(y)
         x1 = MajorityJudgement(x)
@@ -141,8 +143,10 @@ class TestMajorityJudgementSoundness:
         x2 = MajorityJudgement(drop_outliers(x, k))
         y2 = MajorityJudgement(drop_outliers(y, k))
 
-        if x1 <= y1: assert x2 <= y2
-        else: assert y2 <= x2
+        if x1 <= y1:
+            assert x2 <= y2
+        else:
+            assert y2 <= x2
 
     def build_single_upvote(self, k, n):
         return [k] + [0 for _ in xrange(n-1)] + [1]
@@ -158,32 +162,33 @@ class TestMajorityJudgementSoundness:
         x = self.build_single_upvote(k, n)
         l = list(MajorityJudgement(x))
         assert l == [0 for _ in xrange(k)] + [n]
-        
+
     @pytest.mark.parametrize(("k", "m", "n"), [
         (10, 1, 5),
-        (10, 5,6),
-        (10, 3,5),
-        (1, 1,2),
-        (2, 10,20)
+        (10, 5, 6),
+        (10, 3, 5),
+        (1, 1, 2),
+        (2, 10, 20)
     ])
     def test_single_upvote_determines_result(self, k, m, n):
-        assert MajorityJudgement(self.build_single_upvote(k, n)) > MajorityJudgement(self.build_single_upvote(k, m))
+        assert (MajorityJudgement(self.build_single_upvote(k, n)) >
+                MajorityJudgement(self.build_single_upvote(k, m)))
 
     order_tests = pytest.mark.parametrize(("x", "y"), [
-        ([10], [5,5]),
+        ([10], [5, 5]),
         ([10], [9, 1]),
         ([9, 1], [5, 5]),
-        ([1,1,1,1,1], [0,1,1,1,2]),
-        ([5,5], [10,10])
+        ([1, 1, 1, 1, 1], [0, 1, 1, 1, 2]),
+        ([5, 5], [10, 10])
     ])
 
     @order_tests
-    def test_on_specified_pairs_unevaluated(self,x,y):
+    def test_on_specified_pairs_unevaluated(self, x, y):
         assert MajorityJudgement(x) < MajorityJudgement(y)
         assert MajorityJudgement(y) > MajorityJudgement(x)
 
     @order_tests
-    def test_on_specified_pairs_fully_evaluated(self,x,y):
+    def test_on_specified_pairs_fully_evaluated(self, x, y):
         xe = MajorityJudgement(x)
         ye = MajorityJudgement(y)
         list(xe)
@@ -192,8 +197,8 @@ class TestMajorityJudgementSoundness:
         assert ye > xe
 
     @pytest.mark.parametrize(("ev"), [example_votes])
-    def test_sorts_like_corresponding_lists(self,ev):
-        by_mj = [list(x) for x in sorted([MajorityJudgement(y) for y in ev])] 
+    def test_sorts_like_corresponding_lists(self, ev):
+        by_mj = [list(x) for x in sorted([MajorityJudgement(y) for y in ev])]
         by_list = sorted([list(MajorityJudgement(y)) for y in ev])
         assert by_mj == by_list
 
@@ -216,7 +221,7 @@ class TestMajorityJudgementSoundness:
         assert MajorityJudgement([1]) > MajorityJudgement([])
 
     def test_no_delete(self):
-        x = MajorityJudgement([1,2,3])
+        x = MajorityJudgement([1, 2, 3])
         l = list(x)
         with pytest.raises(TypeError) as excinfo:
             del x[0]
@@ -224,7 +229,7 @@ class TestMajorityJudgementSoundness:
         assert list(x) == l
 
     def test_no_set(self):
-        x = MajorityJudgement([1,2,3])
+        x = MajorityJudgement([1, 2, 3])
         l = list(x)
         with pytest.raises(TypeError) as excinfo:
             x[0] = 15
@@ -233,6 +238,6 @@ class TestMajorityJudgementSoundness:
 
     def test_index_out_of_bounds(self):
         with pytest.raises(IndexError):
-            MajorityJudgement([1,2,3])[6]
+            MajorityJudgement([1, 2, 3])[6]
         with pytest.raises(IndexError):
-            MajorityJudgement([1,2,3])[-6]
+            MajorityJudgement([1, 2, 3])[-6]
