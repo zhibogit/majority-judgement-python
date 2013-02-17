@@ -157,30 +157,29 @@ class MajorityJudgement:
                     # there is remaining x
                     return 1
 
+    def _how_many_to_pop(self, preceding, votes, total):
+        return 1 + min(total - 2 * preceding - 1, 
+                       2 * preceding + 2 * votes  - total)
+
     def _each_judgement(self):
         for x in self._judgement_trail:
             yield x
         while len(self._votes) > 0:
             tot = 0
             for i in xrange(len(self._votes)):  # pragma: no branch
-                tot += self._votes[i]
+                preceding = tot
+                v = self._votes[i]
+                tot += v
                 if 2 * tot >= self._votes_remaining:
-                    votes_to_pop = 1
+                    votes_to_pop = self._how_many_to_pop(preceding, 
+                                                         v, 
+                                                         self._votes_remaining)
+                    assert votes_to_pop <= v
                     self._votes_remaining -= votes_to_pop
                     self._votes[i] -= votes_to_pop
-
                     while len(self._votes) > 0 and self._votes[-1] <= 0:
                         self._votes.pop()
-
-                    if len(self._judgement_trail) > 0:
-                        xv = self._judgement_trail[-1]
-                    else:
-                        xv = None
-
-                    if xv and xv[0] == i:
-                        xv[1] = xv[1] + votes_to_pop
-                    else:
-                        self._judgement_trail.append([i, votes_to_pop])
-
-                    yield [i, 1]
+                    r = [i, votes_to_pop]
+                    self._judgement_trail.append(r)
+                    yield r
                     break
