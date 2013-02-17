@@ -1,10 +1,10 @@
 """
 Majority judgement is a method of voting in which participants assign grades
 to candidates. These grades can be any ordinal values (numbers, "A,B,C", "Good,
-Bad,Terrible", etc. All that matters is the relative ordinal positions of the 
+Bad,Terrible", etc. All that matters is the relative ordinal positions of the
 grades.
 
-In this module we assume that grades are consecutive integer values starting 
+In this module we assume that grades are consecutive integer values starting
 from 0 as the lowest. Any other grades can be trivially converted to this form.
 
 The essential idea of majority judgement is that we sort the grades assigned to
@@ -25,11 +25,12 @@ This candidate would win because their second grading is better than the first
 candidate's.
 
 This module provides a type which wraps a tally of grades and is then ordered
-in terms of the majority judgement. It may then be used to implement a voting 
+in terms of the majority judgement. It may then be used to implement a voting
 procedure by assigning each candidate their tally and taking the maximum.
 """
 
 class MajorityJudgement:
+
     def __init__(self, votes):
         self.length = sum(votes)
         self.votes = list(votes)
@@ -37,19 +38,19 @@ class MajorityJudgement:
         self.judgement_trail = []
 
     def __repr__(self):
-        return "MajorityJudgement(%s, %s)" % (self.judgement_trail, self.votes) 
+        return "MajorityJudgement(%s, %s)" % (self.judgement_trail, self.votes)
 
-    def __eq__(self, other): 
+    def __eq__(self, other):
         return self.compare(other) == 0
-    def __ne__(self, other): 
+    def __ne__(self, other):
         return self.compare(other) != 0
-    def __lt__(self, other): 
+    def __lt__(self, other):
         return self.compare(other) < 0
-    def __le__(self, other): 
+    def __le__(self, other):
         return self.compare(other) <= 0
-    def __gt__(self, other): 
+    def __gt__(self, other):
         return self.compare(other) > 0
-    def __ge__(self, other): 
+    def __ge__(self, other):
         return self.compare(other) >= 0
 
     def __len__(self):
@@ -57,38 +58,38 @@ class MajorityJudgement:
 
     def __getitem__(self, i):
         l = len(self)
-        if i < 0 and i > -l: 
+        if i < 0 and i > -l:
             i = i + l
         elif i < 0 or i >= l:
             raise IndexError("Index %d out of range [0, %d)", i, len(self))
 
         for x, n in self.each_judgement():    # pragma: no branch
-            if i < n: 
+            if i < n:
                 return x
             i = i - n
 
-    def __delitem__(self, i):   
+    def __delitem__(self, i):
         raise TypeError(
-            "MajorityJudgement objects do not support modifying" 
+            "MajorityJudgement objects do not support modifying"
             "the contents")
 
     def __setitem__(self, i, x):
         raise TypeError(
-            "MajorityJudgement objects do not support modifying" 
+            "MajorityJudgement objects do not support modifying"
             "the contents")
- 
+
     def __iter__(self):
         for (x, n) in self.each_judgement():
             for _ in xrange(n): yield x
 
     def compare(self, other):
-        if self is other: 
+        if self is other:
             return 0
-        if len(self) == 0 and len(other) == 0: 
+        if len(self) == 0 and len(other) == 0:
             return 0
-        if len(self) == 0: 
+        if len(self) == 0:
             return -1
-        if len(other) == 0: 
+        if len(other) == 0:
             return 1
 
         si = self.each_judgement()
@@ -98,9 +99,9 @@ class MajorityJudgement:
         y, yn = oi.next()
 
         while True:
-            if x < y: 
+            if x < y:
                 return -1
-            if y < x: 
+            if y < x:
                 return 1
 
             m = min(xn, yn)
@@ -108,30 +109,30 @@ class MajorityJudgement:
             yn = yn - m
 
             if xn == 0:
-                try: 
+                try:
                     x, xn = si.next()
                 except StopIteration:
-                    if yn > 0: 
+                    if yn > 0:
                         return -1
-                    else: 
-                        try: 
+                    else:
+                        try:
                             oi.next()
                             return -1
-                        except StopIteration: 
+                        except StopIteration:
                             return 0
 
             if yn == 0:
-                try: 
+                try:
                     y, yn = oi.next()
-                except StopIteration: 
-                    # The fact that we've got this far means that xn > 0 so 
+                except StopIteration:
+                    # The fact that we've got this far means that xn > 0 so
                     # there is remaining x
                     return 1
-            
+
     def each_judgement(self):
-        for x in self.judgement_trail: 
+        for x in self.judgement_trail:
             yield x
-        while len(self.votes) > 0: 
+        while len(self.votes) > 0:
             tot = 0
             for i in xrange(len(self.votes)): # pragma: no branch
                 tot += self.votes[i]
@@ -140,12 +141,12 @@ class MajorityJudgement:
                     self.votes_remaining -= votes_to_pop
                     self.votes[i] -= votes_to_pop
 
-                    while len(self.votes) > 0 and self.votes[-1] <= 0: 
+                    while len(self.votes) > 0 and self.votes[-1] <= 0:
                         self.votes.pop()
-                    
-                    if len(self.judgement_trail) > 0: 
+
+                    if len(self.judgement_trail) > 0:
                         xv = self.judgement_trail[-1]
-                    else: 
+                    else:
                         xv = None
 
                     if xv and xv[0] == i:
