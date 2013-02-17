@@ -1,10 +1,6 @@
-===========
-Majority Judgement
-===========
-
 This is an implementation of the Majority Judgement voting procedure, as
-proposed by Michel Balinski and Rida Laraki in [A theory of measuring, electing
-, and ranking](http://www.pnas.org/content/104/21/8720.full).
+proposed by Michel Balinski and Rida Laraki in `A theory of measuring, electing
+, and ranking <http://www.pnas.org/content/104/21/8720.full>`_
 
 It takes tallies of grades provided by voters and provides a python type to 
 wrap them which is ordered according to the majority judgement order. 
