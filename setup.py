@@ -14,7 +14,7 @@ class PyTest(TestCommand):
 
 setup(
     name='majorityjudgement',
-    version='0.0.1',
+    version='0.0.2',
     author='David R. MacIver',
     author_email='david@drmaciver.com',
     packages=['majorityjudgement'],
