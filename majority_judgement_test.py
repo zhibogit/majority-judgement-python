@@ -71,9 +71,9 @@ class TestMajorityJudgementSoundness:
     @pytest.mark.parametrize(("x", "y"), [
         (x, y) for x in example_votes for y in example_votes
     ])
-    def test_anti_symmetry_of_compare(self, x, y):
-        assert (MajorityJudgement(x).compare(MajorityJudgement(y)) ==
-                -MajorityJudgement(y).compare(MajorityJudgement(x)))
+    def test_anti_symmetry_of__compare(self, x, y):
+        assert (MajorityJudgement(x)._compare(MajorityJudgement(y)) ==
+                -MajorityJudgement(y)._compare(MajorityJudgement(x)))
 
     @on_all_examples
     def test_length_agrees_with_list(self, x):
@@ -206,7 +206,7 @@ class TestMajorityJudgementSoundness:
     def test_repr_does_not_evaluate(self, x):
         x = MajorityJudgement(x)
         repr(x)
-        assert len(x.judgement_trail) == 0
+        assert len(x._judgement_trail) == 0
 
     @on_all_examples
     def test_repr_reflects_evaluation(self, x):

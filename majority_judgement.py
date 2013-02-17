@@ -36,7 +36,7 @@ procedure by assigning each candidate their tally and taking the maximum.
 class MajorityJudgement:
     """
     Objects of type MajorityJudgement behave like a lazily evaluated frozen 
-    list. They may be indexed, iterated over and compared exactly as if they
+    list. They may be indexed, iterated over and _compared exactly as if they
     were their list of majority judgement grades.
     """
     def __init__(self, votes):
@@ -46,34 +46,34 @@ class MajorityJudgement:
         [1,2,1] means that there is one vote each of grades 0 and 2 and 2 votes
         of grade 1, not that there 2 votes of grade 1 and 1 of grade 2.
         """
-        self.length = sum(votes)
-        self.votes = list(votes)
-        self.votes_remaining = sum(votes)
-        self.judgement_trail = []
+        self._length = sum(votes)
+        self._votes = list(votes)
+        self._votes_remaining = sum(votes)
+        self._judgement_trail = []
 
     def __repr__(self):
-        return "MajorityJudgement(%s, %s)" % (self.judgement_trail, self.votes)
+        return "MajorityJudgement(%s, %s)" % (self._judgement_trail, self._votes)
 
     def __eq__(self, other):
-        return self.compare(other) == 0
+        return self._compare(other) == 0
 
     def __ne__(self, other):
-        return self.compare(other) != 0
+        return self._compare(other) != 0
 
     def __lt__(self, other):
-        return self.compare(other) < 0
+        return self._compare(other) < 0
 
     def __le__(self, other):
-        return self.compare(other) <= 0
+        return self._compare(other) <= 0
 
     def __gt__(self, other):
-        return self.compare(other) > 0
+        return self._compare(other) > 0
 
     def __ge__(self, other):
-        return self.compare(other) >= 0
+        return self._compare(other) >= 0
 
     def __len__(self):
-        return self.length
+        return self._length
 
     def __getitem__(self, i):
         l = len(self)
@@ -81,7 +81,7 @@ class MajorityJudgement:
             i = i + l
         elif i < 0 or i >= l:
             raise IndexError("Index %d out of range [0, %d)", i, len(self))
-        for x, n in self.each_judgement():    # pragma: no branch
+        for x, n in self._each_judgement():    # pragma: no branch
             if i < n:
                 return x
             i = i - n
@@ -97,11 +97,11 @@ class MajorityJudgement:
             "the contents")
 
     def __iter__(self):
-        for (x, n) in self.each_judgement():
+        for (x, n) in self._each_judgement():
             for _ in xrange(n):
                 yield x
 
-    def compare(self, other):
+    def _compare(self, other):
         """
             Return an integer expressing the order relation between self and 
             other. -1 if self < other, 0 if self == other, 1 if self > other.
@@ -120,8 +120,8 @@ class MajorityJudgement:
         if len(other) == 0:
             return 1
 
-        si = self.each_judgement()
-        oi = other.each_judgement()
+        si = self._each_judgement()
+        oi = other._each_judgement()
 
         x, xn = si.next()
         y, yn = oi.next()
@@ -157,30 +157,30 @@ class MajorityJudgement:
                     # there is remaining x
                     return 1
 
-    def each_judgement(self):
-        for x in self.judgement_trail:
+    def _each_judgement(self):
+        for x in self._judgement_trail:
             yield x
-        while len(self.votes) > 0:
+        while len(self._votes) > 0:
             tot = 0
-            for i in xrange(len(self.votes)):  # pragma: no branch
-                tot += self.votes[i]
-                if 2 * tot >= self.votes_remaining:
+            for i in xrange(len(self._votes)):  # pragma: no branch
+                tot += self._votes[i]
+                if 2 * tot >= self._votes_remaining:
                     votes_to_pop = 1
-                    self.votes_remaining -= votes_to_pop
-                    self.votes[i] -= votes_to_pop
+                    self._votes_remaining -= votes_to_pop
+                    self._votes[i] -= votes_to_pop
 
-                    while len(self.votes) > 0 and self.votes[-1] <= 0:
-                        self.votes.pop()
+                    while len(self._votes) > 0 and self._votes[-1] <= 0:
+                        self._votes.pop()
 
-                    if len(self.judgement_trail) > 0:
-                        xv = self.judgement_trail[-1]
+                    if len(self._judgement_trail) > 0:
+                        xv = self._judgement_trail[-1]
                     else:
                         xv = None
 
                     if xv and xv[0] == i:
                         xv[1] = xv[1] + votes_to_pop
                     else:
-                        self.judgement_trail.append([i, votes_to_pop])
+                        self._judgement_trail.append([i, votes_to_pop])
 
                     yield [i, 1]
                     break
