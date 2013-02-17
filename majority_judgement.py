@@ -1,11 +1,15 @@
 """
-Majority judgement is a method of voting in which participants assign grades
-to candidates. These grades can be any ordinal values (numbers, "A,B,C", "Good,
-Bad,Terrible", etc. All that matters is the relative ordinal positions of the
-grades.
+Majority Judgement is a method of voting proposed by Michel Balinski 
+and Rida Laraki in "A theory of measuring, electing, and ranking"
+(http://www.pnas.org/content/104/21/8720.full)
+
+Members of the electorate vote by assigning grades to candidates. These grades 
+can be any ordinal values (numbers, "A,B,C", "Good, Bad,Terrible", etc. 
+All that matters is the relative ordinal positions of the grades.
 
 In this module we assume that grades are consecutive integer values starting
-from 0 as the lowest. Any other grades can be trivially converted to this form.
+from 0 as the lowest. Because all that matters is the ordering, any other 
+grading scheme can be trivially converted to this form.
 
 The essential idea of majority judgement is that we sort the grades assigned to
 the candidate in order of most significant to least significant. At any given
@@ -29,9 +33,19 @@ in terms of the majority judgement. It may then be used to implement a voting
 procedure by assigning each candidate their tally and taking the maximum.
 """
 
-
 class MajorityJudgement:
+    """
+    Objects of type MajorityJudgement behave like a lazily evaluated frozen 
+    list. They may be indexed, iterated over and compared exactly as if they
+    were their list of majority judgement grades.
+    """
     def __init__(self, votes):
+        """
+        Create a MajorityJudgement object from a tally of grades. Note that
+        the votes are taken as tallies, not as a list of grades. i.e. 
+        [1,2,1] means that there is one vote each of grades 0 and 2 and 2 votes
+        of grade 1, not that there 2 votes of grade 1 and 1 of grade 2.
+        """
         self.length = sum(votes)
         self.votes = list(votes)
         self.votes_remaining = sum(votes)
@@ -88,6 +102,15 @@ class MajorityJudgement:
                 yield x
 
     def compare(self, other):
+        """
+            Return an integer expressing the order relation between self and 
+            other. -1 if self < other, 0 if self == other, 1 if self > other.
+
+            Ordering is defined to be equivalent to lexicographical ordering of
+            list(self) and list(other), but may not fully evaluate the sequence
+            and may require less iteration due to long stretches of common 
+            values.
+        """
         if self is other:
             return 0
         if len(self) == 0 and len(other) == 0:
