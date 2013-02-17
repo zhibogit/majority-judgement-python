@@ -42,7 +42,7 @@ class MajorityJudgement:
 
     def compare(self, other):
         if self is other: 
-            return False
+            return 0
         if len(self) == 0 and len(other) == 0: 
             return 0
         if len(self) == 0: 
