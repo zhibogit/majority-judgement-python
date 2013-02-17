@@ -1,4 +1,4 @@
-from majority_judgement import MajorityJudgement
+from majorityjudgement import MajorityJudgement
 import pytest
 import re
 

@@ -1,6 +1,7 @@
 *.pyc
 *.swp
 *.swo
-static/stylesheets/*.css
 venv
-.sass-cache
+build
+dist
+*egg-info*

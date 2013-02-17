@@ -1,0 +1,1 @@
+from grading import MajorityJudgement
