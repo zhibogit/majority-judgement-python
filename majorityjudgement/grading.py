@@ -138,21 +138,39 @@ class MajorityJudgement:
         for x in self._judgement_trail:
             yield x
         while len(self._votes) > 0:
+            assert sum(self._votes) == self._votes_remaining
             tot = 0
             for i in xrange(len(self._votes)):  # pragma: no branch
                 preceding = tot
                 v = self._votes[i]
                 tot += v
                 if 2 * tot >= self._votes_remaining:
-                    votes_to_pop = self._how_many_to_pop(preceding, 
-                                                         v, 
-                                                         self._votes_remaining)
-                    assert votes_to_pop <= v
+                    if 2 * tot == self._votes_remaining:
+                        relevant_indices = [i, i+1]
+                        votes_to_pop = self._how_many_to_pop(preceding, 
+                                                             v + self._votes[i+1], 
+                                                             self._votes_remaining)
+                        k = votes_to_pop / 2
+                        votes_to_pop = k * 2
+
+                        if k == 0:
+                            relevant_indices = [i]
+                            k = 1
+                            votes_to_pop = 1
+                    else:
+                        relevant_indices = [i]
+                        votes_to_pop = self._how_many_to_pop(preceding, 
+                                                             v, 
+                                                             self._votes_remaining)
+                        k = votes_to_pop
+
                     self._votes_remaining -= votes_to_pop
-                    self._votes[i] -= votes_to_pop
+                    for i in relevant_indices:
+                        self._votes[i] -= k   
+ 
                     while len(self._votes) > 0 and self._votes[-1] <= 0:
                         self._votes.pop()
-                    r = [[i], votes_to_pop]
+                    r = [relevant_indices, k]
                     self._judgement_trail.append(r)
                     yield r
                     break
