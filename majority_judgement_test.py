@@ -44,6 +44,12 @@ class TestMajorityJudgementSoundness:
       assert x == x
 
     @on_all_examples
+    def test_calling_list_twice_produces_same_result(self, x):
+      x = MajorityJudgement(x)
+      assert list(x) == list(x)
+
+
+    @on_all_examples
     def test_equality_of_identical_inputs(self, x):
       assert MajorityJudgement(x) == MajorityJudgement(x)
 

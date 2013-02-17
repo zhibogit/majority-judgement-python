@@ -61,6 +61,13 @@ class MajorityJudgement:
         self.votes_remaining -= 1
         self.votes[i] -= 1
         while len(self.votes) > 0 and self.votes[-1] <= 0: self.votes.pop()
-        self.judgement_trail.append((i, 1))
-        return (i, 1)
+        
+        if len(self.judgement_trail) > 0: xv = self.judgement_trail[-1]
+        else: xv = None
 
+        if xv and xv[0] == i:
+          xv[1] = xv[1] + 1
+        else:
+          self.judgement_trail.append([i, 1])
+
+        return [i, 1]
