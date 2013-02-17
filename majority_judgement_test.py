@@ -232,4 +232,8 @@ class TestMajorityJudgementSoundness:
             assert re.search('not support modifying', excinfo.value.message)
             assert list(x) == l
 
-        
+        def test_index_out_of_bounds(self):
+            with pytest.raises(IndexError):
+                MajorityJudgement([1,2,3])[6]
+            with pytest.raises(IndexError):
+                MajorityJudgement([1,2,3])[-6]
