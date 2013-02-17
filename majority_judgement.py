@@ -23,7 +23,7 @@ class MajorityJudgement:
     if i < 0 and i > -l: i = i + l
     elif i < 0 or i >= l: raise IndexError("Index %d out of range [0, %d)", i, len(self))
 
-    for x, n in self.each_judgement():
+    for x, n in self.each_judgement():  # pragma: no branch
       if i < n: return x
       i = i - n
   
@@ -59,7 +59,7 @@ class MajorityJudgement:
 
   def pop_vote(self):
     tot = 0
-    for i in xrange(len(self.votes)):
+    for i in xrange(len(self.votes)): # pragma: no branch
       tot += self.votes[i]
       if 2 * tot >= self.votes_remaining:
         self.votes_remaining -= 1
