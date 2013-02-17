@@ -43,37 +43,30 @@ class MajorityJudgement:
     x, xn = si.next()
     y, yn = oi.next()
 
-    def pop_head(a,b):
-      def clamp(n): 
-        if n < 0: return 0
-        else: return n
-      c = min(a,b)
-      return (clamp(a - c), clamp(b - c))
-
-    def any_remaining(n, i):
-      if n > 0: return True
-      try: 
-        i.next()
-        return True
-      except StopIteration: return False
-
     while True:
       if x < y: return -1
       if y < x: return 1
 
-      xn,yn = pop_head(xn, yn)
+      m = min(xn,yn)
+      xn = xn - m
+      yn = yn - m
 
       if xn == 0:
         try: x, xn = si.next()
         except StopIteration:
-          if any_remaining(yn, oi): return -1
-          else: return 0
+          if yn > 0: return -1
+          else: 
+            try: 
+              oi.next()
+              return -1
+            except StopIteration: 
+              return 0
 
       if yn == 0:
         try: y, yn = oi.next()
         except StopIteration: 
-          if any_remaining(xn, si): return 1
-          else: return 0
+          # The fact that we've got this far means that xn > 0 so there is remaining x
+          return 1
       
   def each_judgement(self):
     for x in self.judgement_trail: yield x

@@ -66,6 +66,13 @@ class TestMajorityJudgementSoundness:
     def test_inequality_of_different_inputs(self, x, y):
       assert MajorityJudgement(x) != MajorityJudgement(y)
 
+    @pytest.mark.parametrize(("x", "y"), [
+      (x, y) for x in example_votes for y in example_votes
+    ])
+    def test_anti_symmetry_of_compare(self, x, y):
+      assert MajorityJudgement(x).compare(MajorityJudgement(y)) == -MajorityJudgement(y).compare(MajorityJudgement(x))
+
+
     @on_all_examples
     def test_length_agrees_with_list(self, x):
       assert len(MajorityJudgement(x)) == len(list(MajorityJudgement(x)))
@@ -173,6 +180,7 @@ class TestMajorityJudgementSoundness:
     @order_tests
     def test_on_specified_pairs_unevaluated(self,x,y):
       assert MajorityJudgement(x) < MajorityJudgement(y)
+      assert MajorityJudgement(y) > MajorityJudgement(x)
 
     @order_tests
     def test_on_specified_pairs_fully_evaluated(self,x,y):
@@ -181,6 +189,7 @@ class TestMajorityJudgementSoundness:
       list(xe)
       list(ye)
       assert xe < ye
+      assert ye > xe
 
     @pytest.mark.parametrize(("ev"), [example_votes])
     def test_sorts_like_corresponding_lists(self,ev):
@@ -200,3 +209,9 @@ class TestMajorityJudgementSoundness:
       o = repr(x)
       list(x)
       assert repr(x) != o
+
+    def test_empty_behaviour(self):
+      assert MajorityJudgement([]) == MajorityJudgement([])
+      assert MajorityJudgement([]) < MajorityJudgement([1])
+      assert MajorityJudgement([1]) > MajorityJudgement([])
+
