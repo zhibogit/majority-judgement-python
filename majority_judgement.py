@@ -1,5 +1,6 @@
 class MajorityJudgement:
   def __init__(self, votes):
+    self.length = sum(votes)
     self.votes = list(votes)
     self.votes_remaining = sum(votes)
     self.judgement_trail = []
@@ -15,7 +16,7 @@ class MajorityJudgement:
   def __ge__(self, other): return self.compare(other) >= 0
 
   def __len__(self):
-    return sum([n for _, n in self.judgement_trail]) + self.votes_remaining
+    return self.length
 
   def __getitem__(self, i):
     l = len(self)
