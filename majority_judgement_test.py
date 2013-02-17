@@ -154,3 +154,16 @@ class TestMajorityJudgementSoundness:
     ])
     def test_single_upvote_determines_result(self, k, m, n):
       assert MajorityJudgement(self.build_single_upvote(k, n)) > MajorityJudgement(self.build_single_upvote(k, m))
+
+    @on_all_examples
+    def test_repr_does_not_evaluate(self, x):
+      x = MajorityJudgement(x)
+      repr(x)
+      assert len(x.judgement_trail) == 0
+
+    @on_all_examples
+    def test_repr_reflects_evaluation(self, x):
+      x = MajorityJudgement(x)
+      o = repr(x)
+      list(x)
+      assert repr(x) != o
