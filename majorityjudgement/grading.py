@@ -1,14 +1,14 @@
 """
-Majority Judgement is a method of voting proposed by Michel Balinski 
+Majority Judgement is a method of voting proposed by Michel Balinski
 and Rida Laraki in "A theory of measuring, electing, and ranking"
 (http://www.pnas.org/content/104/21/8720.full)
 
-Members of the electorate vote by assigning grades to candidates. These grades 
-can be any ordinal values (numbers, "A,B,C", "Good, Bad,Terrible", etc. 
+Members of the electorate vote by assigning grades to candidates. These grades
+can be any ordinal values (numbers, "A,B,C", "Good, Bad,Terrible", etc.
 All that matters is the relative ordinal positions of the grades.
 
 In this module we assume that grades are consecutive integer values starting
-from 0 as the lowest. Because all that matters is the ordering, any other 
+from 0 as the lowest. Because all that matters is the ordering, any other
 grading scheme can be trivially converted to this form.
 
 The essential idea of majority judgement is that we sort the grades assigned to
@@ -36,16 +36,17 @@ procedure by assigning each candidate their tally and taking the maximum.
 import compare_rle
 from cyclicgenerator import CyclicGenerator
 
+
 class MajorityJudgement:
     """
-    Objects of type MajorityJudgement behave like a lazily evaluated frozen 
+    Objects of type MajorityJudgement behave like a lazily evaluated frozen
     list. They may be indexed, iterated over and _compared exactly as if they
     were their list of majority judgement grades.
     """
     def __init__(self, votes):
         """
         Create a MajorityJudgement object from a tally of grades. Note that
-        the votes are taken as tallies, not as a list of grades. i.e. 
+        the votes are taken as tallies, not as a list of grades. i.e.
         [1,2,1] means that there is one vote each of grades 0 and 2 and 2 votes
         of grade 1, not that there 2 votes of grade 1 and 1 of grade 2.
         """
@@ -108,12 +109,12 @@ class MajorityJudgement:
 
     def _compare(self, other):
         """
-            Return an integer expressing the order relation between self and 
+            Return an integer expressing the order relation between self and
             other. -1 if self < other, 0 if self == other, 1 if self > other.
 
             Ordering is defined to be equivalent to lexicographical ordering of
             list(self) and list(other), but may not fully evaluate the sequence
-            and may require less iteration due to long stretches of common 
+            and may require less iteration due to long stretches of common
             values.
         """
         if self is other:
@@ -131,8 +132,8 @@ class MajorityJudgement:
         return compare_rle.compare(si, oi)
 
     def _how_many_to_pop(self, preceding, votes, total):
-        return 1 + min(total - 2 * preceding - 1, 
-                       2 * preceding + 2 * votes  - total)
+        return 1 + min(total - 2 * preceding - 1,
+                       2 * preceding + 2 * votes - total)
 
     def _each_judgement(self):
         for x in self._judgement_trail:
@@ -147,8 +148,8 @@ class MajorityJudgement:
                 if 2 * tot >= self._votes_remaining:
                     if 2 * tot == self._votes_remaining:
                         relevant_indices = [i, i+1]
-                        votes_to_pop = self._how_many_to_pop(preceding, 
-                                                             v + self._votes[i+1], 
+                        votes_to_pop = self._how_many_to_pop(preceding,
+                                                             v + self._votes[i+1],
                                                              self._votes_remaining)
                         k = votes_to_pop / 2
                         votes_to_pop = k * 2
@@ -159,15 +160,15 @@ class MajorityJudgement:
                             votes_to_pop = 1
                     else:
                         relevant_indices = [i]
-                        votes_to_pop = self._how_many_to_pop(preceding, 
-                                                             v, 
+                        votes_to_pop = self._how_many_to_pop(preceding,
+                                                             v,
                                                              self._votes_remaining)
                         k = votes_to_pop
 
                     self._votes_remaining -= votes_to_pop
                     for i in relevant_indices:
-                        self._votes[i] -= k   
- 
+                        self._votes[i] -= k
+
                     while len(self._votes) > 0 and self._votes[-1] <= 0:
                         self._votes.pop()
                     r = [relevant_indices, k]

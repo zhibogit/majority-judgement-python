@@ -1,9 +1,11 @@
 class CyclicGenerator:
+
     def __init__(self, generator):
         self.generator = generator
         self.current_cycle = None
         self.current_index = 0
         self.current_count = 0
+
     def next(self):
         if not self.current_cycle or self.current_count <= 0:
             (self.current_cycle, self.current_count) = self.generator.next()
@@ -20,5 +22,6 @@ class CyclicGenerator:
         result = self.current_cycle[self.current_index]
         self.current_index = self.current_index + 1
         return (result, 1)
+
     def __iter__(self):
         return self

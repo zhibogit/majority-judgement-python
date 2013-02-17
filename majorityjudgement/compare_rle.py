@@ -32,4 +32,3 @@ def compare(si, oi):
                 # The fact that we've got this far means that xn > 0 so
                 # there is remaining x
                 return 1
-
