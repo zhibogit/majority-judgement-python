@@ -33,24 +33,48 @@ class MajorityJudgement:
 
   def compare(self, other):
     if self is other: return False
-    si = iter(self)
-    oi = iter(other)
+    if len(self) == 0 and len(other) == 0: return 0
+    if len(self) == 0: return -1
+    if len(other) == 0: return 1
+
+    si = self.each_judgement()
+    oi = other.each_judgement()
+
+    x, xn = si.next()
+    y, yn = oi.next()
+
+    def pop_head(a,b):
+      def clamp(n): 
+        if n < 0: return 0
+        else: return n
+      c = min(a,b)
+      return (clamp(a - c), clamp(b - c))
+
+    def any_remaining(n, i):
+      if n > 0: return True
+      try: 
+        i.next()
+        return True
+      except StopIteration: return False
 
     while True:
-      try: x = si.next()
-      except StopIteration:
-        try: 
-          oi.next()
-          return -1
-        except StopIteration:
-          return 0
-      try: y = oi.next()
-      except StopIteration: return 1
-
       if x < y: return -1
-      if x > y: return 1
+      if y < x: return 1
 
+      xn,yn = pop_head(xn, yn)
 
+      if xn == 0:
+        try: x, xn = si.next()
+        except StopIteration:
+          if any_remaining(yn, oi): return -1
+          else: return 0
+
+      if yn == 0:
+        try: y, yn = oi.next()
+        except StopIteration: 
+          if any_remaining(xn, si): return 1
+          else: return 0
+      
   def each_judgement(self):
     for x in self.judgement_trail: yield x
     while len(self.votes) > 0: 
