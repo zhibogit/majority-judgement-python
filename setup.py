@@ -18,7 +18,7 @@ setup(
     author='David R. MacIver',
     author_email='david@drmaciver.com',
     packages=['majorityjudgement'],
-    url='http://pypi.python.org/pypi/majorityjudgement/',
+    url='https://github.com/DRMacIver/majority-judgement-python',
     license='LICENSE.txt',
     description='Implementation of majority judgement voting procedure',
     long_description=open('README.txt').read(),

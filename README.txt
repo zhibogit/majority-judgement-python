@@ -9,7 +9,7 @@ proposed by Michel Balinski and Rida Laraki in [A theory of measuring, electing
 It takes tallies of grades provided by voters and provides a python type to 
 wrap them which is ordered according to the majority judgement order. 
 
-For example:
+For example::
 
     x = MajorityJudgement([5, 5])
     y = MajorityJudgement([3, 7])
@@ -24,7 +24,7 @@ In the event that you want more information about the details of the voting,
 the MajorityJudgement objects behave like the corresponding lists of grades assigned
 to them.
 
-So for example
+So for example::
 
     assert list(MajorityJudgement([2,2])) == [0,1,0,1]
 
