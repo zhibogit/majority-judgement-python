@@ -217,17 +217,19 @@ class TestMajorityJudgementSoundness:
             assert MajorityJudgement([1]) > MajorityJudgement([])
 
         def test_no_delete(self):
-          x = MajorityJudgement([1,2,3])
-          l = list(x)
-          with pytest.raises(TypeError) as excinfo:
-              del x[0]
-          assert re.search('not support modifying', excinfo.value.message)
-          assert list(x) == l
+            x = MajorityJudgement([1,2,3])
+            l = list(x)
+            with pytest.raises(TypeError) as excinfo:
+                del x[0]
+            assert re.search('not support modifying', excinfo.value.message)
+            assert list(x) == l
 
         def test_no_set(self):
-          x = MajorityJudgement([1,2,3])
-          l = list(x)
-          with pytest.raises(TypeError) as excinfo:
-              x[0] = 15
-          assert re.search('not support modifying', excinfo.value.message)
-          assert list(x) == l
+            x = MajorityJudgement([1,2,3])
+            l = list(x)
+            with pytest.raises(TypeError) as excinfo:
+                x[0] = 15
+            assert re.search('not support modifying', excinfo.value.message)
+            assert list(x) == l
+
+        
