@@ -29,8 +29,8 @@ in terms of the majority judgement. It may then be used to implement a voting
 procedure by assigning each candidate their tally and taking the maximum.
 """
 
-class MajorityJudgement:
 
+class MajorityJudgement:
     def __init__(self, votes):
         self.length = sum(votes)
         self.votes = list(votes)
@@ -42,14 +42,19 @@ class MajorityJudgement:
 
     def __eq__(self, other):
         return self.compare(other) == 0
+
     def __ne__(self, other):
         return self.compare(other) != 0
+
     def __lt__(self, other):
         return self.compare(other) < 0
+
     def __le__(self, other):
         return self.compare(other) <= 0
+
     def __gt__(self, other):
         return self.compare(other) > 0
+
     def __ge__(self, other):
         return self.compare(other) >= 0
 
@@ -62,7 +67,6 @@ class MajorityJudgement:
             i = i + l
         elif i < 0 or i >= l:
             raise IndexError("Index %d out of range [0, %d)", i, len(self))
-
         for x, n in self.each_judgement():    # pragma: no branch
             if i < n:
                 return x
@@ -80,7 +84,8 @@ class MajorityJudgement:
 
     def __iter__(self):
         for (x, n) in self.each_judgement():
-            for _ in xrange(n): yield x
+            for _ in xrange(n):
+                yield x
 
     def compare(self, other):
         if self is other:
@@ -134,7 +139,7 @@ class MajorityJudgement:
             yield x
         while len(self.votes) > 0:
             tot = 0
-            for i in xrange(len(self.votes)): # pragma: no branch
+            for i in xrange(len(self.votes)):  # pragma: no branch
                 tot += self.votes[i]
                 if 2 * tot >= self.votes_remaining:
                     votes_to_pop = 1
