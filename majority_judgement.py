@@ -8,23 +8,32 @@ class MajorityJudgement:
     def __repr__(self):
         return "MajorityJudgement(%s, %s)" % (self.judgement_trail, self.votes) 
 
-    def __eq__(self, other): return self.compare(other) == 0
-    def __ne__(self, other): return self.compare(other) != 0
-    def __lt__(self, other): return self.compare(other) < 0
-    def __le__(self, other): return self.compare(other) <= 0
-    def __gt__(self, other): return self.compare(other) > 0
-    def __ge__(self, other): return self.compare(other) >= 0
+    def __eq__(self, other): 
+        return self.compare(other) == 0
+    def __ne__(self, other): 
+        return self.compare(other) != 0
+    def __lt__(self, other): 
+        return self.compare(other) < 0
+    def __le__(self, other): 
+        return self.compare(other) <= 0
+    def __gt__(self, other): 
+        return self.compare(other) > 0
+    def __ge__(self, other): 
+        return self.compare(other) >= 0
 
     def __len__(self):
         return self.length
 
     def __getitem__(self, i):
         l = len(self)
-        if i < 0 and i > -l: i = i + l
-        elif i < 0 or i >= l: raise IndexError("Index %d out of range [0, %d)", i, len(self))
+        if i < 0 and i > -l: 
+            i = i + l
+        elif i < 0 or i >= l:
+            raise IndexError("Index %d out of range [0, %d)", i, len(self))
 
         for x, n in self.each_judgement():    # pragma: no branch
-            if i < n: return x
+            if i < n: 
+                return x
             i = i - n
     
     def __iter__(self):
@@ -32,10 +41,14 @@ class MajorityJudgement:
             for _ in xrange(n): yield x
 
     def compare(self, other):
-        if self is other: return False
-        if len(self) == 0 and len(other) == 0: return 0
-        if len(self) == 0: return -1
-        if len(other) == 0: return 1
+        if self is other: 
+            return False
+        if len(self) == 0 and len(other) == 0: 
+            return 0
+        if len(self) == 0: 
+            return -1
+        if len(other) == 0: 
+            return 1
 
         si = self.each_judgement()
         oi = other.each_judgement()
@@ -44,17 +57,21 @@ class MajorityJudgement:
         y, yn = oi.next()
 
         while True:
-            if x < y: return -1
-            if y < x: return 1
+            if x < y: 
+                return -1
+            if y < x: 
+                return 1
 
-            m = min(xn,yn)
+            m = min(xn, yn)
             xn = xn - m
             yn = yn - m
 
             if xn == 0:
-                try: x, xn = si.next()
+                try: 
+                    x, xn = si.next()
                 except StopIteration:
-                    if yn > 0: return -1
+                    if yn > 0: 
+                        return -1
                     else: 
                         try: 
                             oi.next()
@@ -63,13 +80,16 @@ class MajorityJudgement:
                             return 0
 
             if yn == 0:
-                try: y, yn = oi.next()
+                try: 
+                    y, yn = oi.next()
                 except StopIteration: 
-                    # The fact that we've got this far means that xn > 0 so there is remaining x
+                    # The fact that we've got this far means that xn > 0 so 
+                    # there is remaining x
                     return 1
             
     def each_judgement(self):
-        for x in self.judgement_trail: yield x
+        for x in self.judgement_trail: 
+            yield x
         while len(self.votes) > 0: 
             tot = 0
             for i in xrange(len(self.votes)): # pragma: no branch
@@ -79,10 +99,13 @@ class MajorityJudgement:
                     self.votes_remaining -= votes_to_pop
                     self.votes[i] -= votes_to_pop
 
-                    while len(self.votes) > 0 and self.votes[-1] <= 0: self.votes.pop()
+                    while len(self.votes) > 0 and self.votes[-1] <= 0: 
+                        self.votes.pop()
                     
-                    if len(self.judgement_trail) > 0: xv = self.judgement_trail[-1]
-                    else: xv = None
+                    if len(self.judgement_trail) > 0: 
+                        xv = self.judgement_trail[-1]
+                    else: 
+                        xv = None
 
                     if xv and xv[0] == i:
                         xv[1] = xv[1] + votes_to_pop
