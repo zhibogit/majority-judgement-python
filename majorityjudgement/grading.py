@@ -34,6 +34,7 @@ procedure by assigning each candidate their tally and taking the maximum.
 """
 
 import compare_rle
+from cyclicgenerator import CyclicGenerator
 
 class MajorityJudgement:
     """
@@ -84,9 +85,10 @@ class MajorityJudgement:
         elif i < 0 or i >= l:
             raise IndexError("Index %d out of range [0, %d)", i, len(self))
         for x, n in self._each_judgement():    # pragma: no branch
-            if i < n:
-                return x
-            i = i - n
+            m = n * len(x)
+            if i < m:
+                return x[i % len(x)]
+            i = i - m
 
     def __delitem__(self, i):
         raise TypeError(
@@ -99,9 +101,10 @@ class MajorityJudgement:
             "the contents")
 
     def __iter__(self):
-        for (x, n) in self._each_judgement():
+        for (xs, n) in self._each_judgement():
             for _ in xrange(n):
-                yield x
+                for x in xs:
+                    yield x
 
     def _compare(self, other):
         """
@@ -122,8 +125,8 @@ class MajorityJudgement:
         if len(other) == 0:
             return 1
 
-        si = self._each_judgement()
-        oi = other._each_judgement()
+        si = CyclicGenerator(self._each_judgement())
+        oi = CyclicGenerator(other._each_judgement())
 
         return compare_rle.compare(si, oi)
 
@@ -149,7 +152,7 @@ class MajorityJudgement:
                     self._votes[i] -= votes_to_pop
                     while len(self._votes) > 0 and self._votes[-1] <= 0:
                         self._votes.pop()
-                    r = [i, votes_to_pop]
+                    r = [[i], votes_to_pop]
                     self._judgement_trail.append(r)
                     yield r
                     break
