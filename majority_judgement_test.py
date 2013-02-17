@@ -156,15 +156,26 @@ class TestMajorityJudgementSoundness:
     def test_single_upvote_determines_result(self, k, m, n):
       assert MajorityJudgement(self.build_single_upvote(k, n)) > MajorityJudgement(self.build_single_upvote(k, m))
 
-    @pytest.mark.parametrize(("x", "y"), [
+    order_tests = pytest.mark.parametrize(("x", "y"), [
       ([10], [5,5]),
       ([10], [9, 1]),
       ([9, 1], [5, 5]),
       ([1,1,1,1,1], [0,1,1,1,2]),
       ([5,5], [10,10])
     ])
-    def test_on_specified_pairs(self,x,y):
+
+    @order_tests
+    def test_on_specified_pairs_unevaluated(self,x,y):
       assert MajorityJudgement(x) < MajorityJudgement(y)
+
+    @order_tests
+    def test_on_specified_pairs_fully_evaluated(self,x,y):
+      xe = MajorityJudgement(x)
+      ye = MajorityJudgement(y)
+      list(xe)
+      list(ye)
+      assert xe < ye
+
 
     
     @pytest.mark.parametrize(("ev"), [example_votes])
