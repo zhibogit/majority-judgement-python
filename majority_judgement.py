@@ -15,20 +15,24 @@ class MajorityJudgement:
   def __ge__(self, other): return self.compare(other) >= 0
 
   def __len__(self):
-    return len(self.judgement_trail) + self.votes_remaining
+    return sum(self.judgement_trail) + self.votes_remaining
 
   def __getitem__(self, i):
     if i < 0 or i >= len(self): raise IndexError("Index %d out of range [0, %d)", i, len(self))
-    while i >= len(self.judgement_trail): self.pop_vote()
-    return self.judgement_trail[i]
+    for x, n in self.each_judgement():
+      if i < n: return x
+      i = i - n
   
   def __iter__(self):
+    for (x, n) in self.each_judgement():
+      for _ in xrange(n): yield x
+
+  def each_judgement(self):
     for x in self.judgement_trail: yield x
     while self.has_remaining_votes(): yield self.pop_vote()
 
   def compare(self, other):
     if self is other: return False
-    
     si = iter(self)
     oi = iter(other)
 
@@ -57,6 +61,6 @@ class MajorityJudgement:
         self.votes_remaining -= 1
         self.votes[i] -= 1
         while len(self.votes) > 0 and self.votes[-1] <= 0: self.votes.pop()
-        self.judgement_trail.append(i)
-        return i
+        self.judgement_trail.append((i, 1))
+        return (i, 1)
 
