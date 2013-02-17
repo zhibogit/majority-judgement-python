@@ -2,6 +2,7 @@ from majority_judgement import MajorityJudgement
 import pytest
 
 class TestMajorityJudgementSoundness:
+
     example_votes = [
       [1,1,1,1,1,1,1,1],
       [1,2,3],
@@ -154,6 +155,23 @@ class TestMajorityJudgementSoundness:
     ])
     def test_single_upvote_determines_result(self, k, m, n):
       assert MajorityJudgement(self.build_single_upvote(k, n)) > MajorityJudgement(self.build_single_upvote(k, m))
+
+    @pytest.mark.parametrize(("x", "y"), [
+      ([10], [5,5]),
+      ([10], [9, 1]),
+      ([9, 1], [5, 5]),
+      ([1,1,1,1,1], [0,1,1,1,2]),
+      ([5,5], [10,10])
+    ])
+    def test_on_specified_pairs(self,x,y):
+      assert MajorityJudgement(x) < MajorityJudgement(y)
+
+    
+    @pytest.mark.parametrize(("ev"), [example_votes])
+    def test_sorts_like_corresponding_lists(self,ev):
+      by_mj = [list(x) for x in sorted([MajorityJudgement(y) for y in ev])] 
+      by_list = sorted([list(MajorityJudgement(y)) for y in ev])
+      assert by_mj == by_list
 
     @on_all_examples
     def test_repr_does_not_evaluate(self, x):
