@@ -82,17 +82,19 @@ class MajorityJudgement:
       for i in xrange(len(self.votes)): # pragma: no branch
         tot += self.votes[i]
         if 2 * tot >= self.votes_remaining:
-          self.votes_remaining -= 1
-          self.votes[i] -= 1
+          votes_to_pop = 1
+          self.votes_remaining -= votes_to_pop
+          self.votes[i] -= votes_to_pop
+
           while len(self.votes) > 0 and self.votes[-1] <= 0: self.votes.pop()
           
           if len(self.judgement_trail) > 0: xv = self.judgement_trail[-1]
           else: xv = None
 
           if xv and xv[0] == i:
-            xv[1] = xv[1] + 1
+            xv[1] = xv[1] + votes_to_pop
           else:
-            self.judgement_trail.append([i, 1])
+            self.judgement_trail.append([i, votes_to_pop])
 
           yield [i, 1]
           break
