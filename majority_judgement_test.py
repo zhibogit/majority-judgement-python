@@ -45,6 +45,14 @@ class TestMajorityJudgementSoundness:
       assert x == x
 
     @on_all_examples
+    def test_equals_self_when_fully_evaluated(self, x):
+      x1 = MajorityJudgement(x)
+      x2 = MajorityJudgement(x)
+      list(x1)
+      assert x1 == x2
+
+
+    @on_all_examples
     def test_calling_list_twice_produces_same_result(self, x):
       x = MajorityJudgement(x)
       assert list(x) == list(x)
@@ -176,8 +184,6 @@ class TestMajorityJudgementSoundness:
       list(ye)
       assert xe < ye
 
-
-    
     @pytest.mark.parametrize(("ev"), [example_votes])
     def test_sorts_like_corresponding_lists(self,ev):
       by_mj = [list(x) for x in sorted([MajorityJudgement(y) for y in ev])] 
