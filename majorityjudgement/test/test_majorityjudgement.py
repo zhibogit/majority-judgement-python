@@ -252,3 +252,7 @@ class TestMajorityJudgementSoundness:
                 last_x = v
                 rlel  = rlel + 1
         assert len(list(xj._each_judgement())) <= rlel
+
+    def test_compresses_two_cycles(self):
+        len(list(MajorityJudgement([10, 10])._each_judgement())) == 1
+        len(list(MajorityJudgement([9, 10])._each_judgement())) == 2
