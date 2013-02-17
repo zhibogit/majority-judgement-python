@@ -129,3 +129,28 @@ class TestMajorityJudgementSoundness:
 
       if x1 <= y1: assert x2 <= y2
       else: assert y2 <= x2
+
+    def build_single_upvote(self, k, n):
+      return [k] + [0 for _ in xrange(n-1)] + [1]
+
+    @pytest.mark.parametrize(("k", "n"), [
+      (10, 1),
+      (10, 5),
+      (10, 3),
+      (1, 1),
+      (2, 10)
+    ])
+    def test_single_upvote_comes_last(self, k, n):
+      x = self.build_single_upvote(k, n)
+      l = list(MajorityJudgement(x))
+      assert l == [0 for _ in xrange(k)] + [n]
+      
+    @pytest.mark.parametrize(("k", "m", "n"), [
+      (10, 1, 5),
+      (10, 5,6),
+      (10, 3,5),
+      (1, 1,2),
+      (2, 10,20)
+    ])
+    def test_single_upvote_determines_result(self, k, m, n):
+      assert MajorityJudgement(self.build_single_upvote(k, n)) > MajorityJudgement(self.build_single_upvote(k, m))
