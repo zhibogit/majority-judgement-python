@@ -18,7 +18,10 @@ class MajorityJudgement:
     return sum([n for _, n in self.judgement_trail]) + self.votes_remaining
 
   def __getitem__(self, i):
-    if i < 0 or i >= len(self): raise IndexError("Index %d out of range [0, %d)", i, len(self))
+    l = len(self)
+    if i < 0 and i > -l: i = i + l
+    elif i < 0 or i >= l: raise IndexError("Index %d out of range [0, %d)", i, len(self))
+
     for x, n in self.each_judgement():
       if i < n: return x
       i = i - n

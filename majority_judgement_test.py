@@ -75,17 +75,21 @@ class TestMajorityJudgementSoundness:
       assert len(list(MajorityJudgement(x))) == total
      
     @on_all_examples 
-    def test_index_matches_list_index(self, x):
-      def index_test(x):
-        index_result = []
-        for i in xrange(0, sum(x)): index_result.append(MajorityJudgement(x)[i])
+    def test_positive_index_matches_list_index(self, x):
+      y = list(MajorityJudgement(x))
+      x = MajorityJudgement(x)
 
-        list_result = list(MajorityJudgement(x))
-        assert index_result == list_result
+      for i in xrange(len(y)):
+        assert x[i] == y[i]
 
-      index_test([10])
-      index_test([1, 2, 3])
-      index_test([1,6,1])
+    @on_all_examples
+    def test_negative_index_matches_list_index(self,x):
+      y = list(MajorityJudgement(x))
+      x = MajorityJudgement(x)
+
+      for i in xrange(len(y)):
+        assert x[-i] == y[-i]
+
 
     @pytest.mark.parametrize(("x", "m"), [
       ([1,1,1,1], 1),
