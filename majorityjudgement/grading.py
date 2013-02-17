@@ -33,6 +33,8 @@ in terms of the majority judgement. It may then be used to implement a voting
 procedure by assigning each candidate their tally and taking the maximum.
 """
 
+import compare_rle
+
 class MajorityJudgement:
     """
     Objects of type MajorityJudgement behave like a lazily evaluated frozen 
@@ -123,39 +125,7 @@ class MajorityJudgement:
         si = self._each_judgement()
         oi = other._each_judgement()
 
-        x, xn = si.next()
-        y, yn = oi.next()
-
-        while True:
-            if x < y:
-                return -1
-            if y < x:
-                return 1
-
-            m = min(xn, yn)
-            xn = xn - m
-            yn = yn - m
-
-            if xn == 0:
-                try:
-                    x, xn = si.next()
-                except StopIteration:
-                    if yn > 0:
-                        return -1
-                    else:
-                        try:
-                            oi.next()
-                            return -1
-                        except StopIteration:
-                            return 0
-
-            if yn == 0:
-                try:
-                    y, yn = oi.next()
-                except StopIteration:
-                    # The fact that we've got this far means that xn > 0 so
-                    # there is remaining x
-                    return 1
+        return compare_rle.compare(si, oi)
 
     def _how_many_to_pop(self, preceding, votes, total):
         return 1 + min(total - 2 * preceding - 1, 
