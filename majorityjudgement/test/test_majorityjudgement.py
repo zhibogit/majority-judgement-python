@@ -1,7 +1,7 @@
 from majorityjudgement import MajorityJudgement
 import pytest
 import re
-
+import copy
 
 class TestMajorityJudgementSoundness:
     example_votes = [
@@ -317,3 +317,33 @@ class TestMajorityJudgementSoundness:
         xj = MajorityJudgement(x)
         list(xj)
         assert list(xj[i:j:k]) == list(xj)[i:j:k]
+
+    @on_all_examples
+    def test_copy(self, x):
+        xj = MajorityJudgement(x)
+        xj2 = copy.copy(xj)
+        assert list(xj) == list(xj2)
+
+    @on_all_examples
+    def test_copy_on_evaluated(self, x):
+        xj = MajorityJudgement(x)
+        list(xj)
+        xj2 = copy.copy(xj)
+        assert list(xj) == list(xj2)
+    
+    @on_all_examples
+    def test_copy_equals_self(self, x):
+        xj = MajorityJudgement(x)
+        assert xj == copy.copy(xj)
+    
+    @on_all_examples
+    def test_deep_copy_equals_self(self, x):
+        xj = MajorityJudgement(x)
+        assert xj == copy.deepcopy(xj)
+
+    @on_all_examples
+    def test_copy_results_in_indepenence(self, x):
+        xj = MajorityJudgement(x)
+        xj2 = copy.copy(xj)
+        list(xj2)
+        assert not xj._judgement_trail

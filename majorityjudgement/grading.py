@@ -35,6 +35,7 @@ procedure by assigning each candidate their tally and taking the maximum.
 
 from pushback_generator import PushbackGenerator
 import collections
+import copy
 
 class MajorityJudgement(collections.Sequence):
     """
@@ -49,10 +50,17 @@ class MajorityJudgement(collections.Sequence):
         [1,2,1] means that there is one vote each of grades 0 and 2 and 2 votes
         of grade 1, not that there 2 votes of grade 1 and 1 of grade 2.
         """
-        self._length = sum(votes)
-        self._votes = list(votes)
-        self._votes_remaining = sum(votes)
-        self._judgement_trail = []
+
+        if isinstance(votes, MajorityJudgement):
+            self._length = votes._length
+            self._votes = copy.copy(votes._votes)
+            self._votes_remaining = votes._votes_remaining
+            self._judgement_trail = copy.deepcopy(votes._judgement_trail)
+        else:
+            self._length = sum(votes)
+            self._votes = list(votes)
+            self._votes_remaining = sum(votes)
+            self._judgement_trail = []
 
     def __repr__(self):
         return "MajorityJudgement(%s, %s)" % (self._judgement_trail, self._votes)
@@ -141,6 +149,12 @@ class MajorityJudgement(collections.Sequence):
             if x in ys:
                 return True
         return False
+
+    def __copy__(self):
+        return MajorityJudgement(self)
+
+    def __deepcopy__(self, _):
+        return self.__copy__()
 
     def _compare(self, other):
         """
