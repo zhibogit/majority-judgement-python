@@ -269,8 +269,8 @@ class TestMajorityJudgementSoundness:
         assert len(list(xj._each_judgement())) <= rlel
 
     def test_compresses_two_cycles(self):
-        len(list(MajorityJudgement([10, 10])._each_judgement())) == 1
-        len(list(MajorityJudgement([9, 10])._each_judgement())) == 2
+        assert len(list(MajorityJudgement([10, 10])._each_judgement())) == 1
+        assert len(list(MajorityJudgement([9, 10])._each_judgement())) == 2
 
     def test_does_not_contains_non_integer(self):
         x = MajorityJudgement([1,2,3])
