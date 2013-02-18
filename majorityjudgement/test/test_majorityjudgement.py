@@ -262,3 +262,28 @@ class TestMajorityJudgementSoundness:
     def test_compresses_two_cycles(self):
         len(list(MajorityJudgement([10, 10])._each_judgement())) == 1
         len(list(MajorityJudgement([9, 10])._each_judgement())) == 2
+
+    def test_does_not_contains_non_integer(self):
+        x = MajorityJudgement([1,2,3])
+        assert "foo" not in x
+        list(x)
+        assert "foo" not in x
+    
+
+    def test_does_not_contain_negative_integer(self):
+        x = MajorityJudgement([1,2,3])
+        assert -1 not in x
+        list(x)
+        assert -1 not in x
+
+    def test_does_not_contain_zero_vote(self):
+        x = MajorityJudgement([1,0,3])
+        assert 1 not in x
+        list(x)
+        assert 1 not in x
+
+    def test_asserts_contain_non_zero_results(self):
+        x = MajorityJudgement([1,1,3])
+        assert 1 in x
+        list(x)
+        assert 1 in x

@@ -111,6 +111,17 @@ class MajorityJudgement:
             for _ in xrange(n):
                 for x in reversed(xs):
                     yield x
+
+    def __contains__(self, x):
+        if not type(x) is int: return False
+        if x < 0: 
+            return False
+        if x < len(self._votes) and self._votes[x]:
+            return True
+        for (ys, n) in self._judgement_trail:
+            if x in ys:
+                return True
+        return False
         
     def _compare(self, other):
         """
