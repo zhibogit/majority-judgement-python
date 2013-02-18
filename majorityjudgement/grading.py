@@ -210,9 +210,13 @@ class MajorityJudgement(collections.Sequence):
                 tot += v
                 if 2 * tot >= self._votes_remaining:
                     if 2 * tot == self._votes_remaining:
-                        relevant_indices = [i, i+1]
+                        next_index = i+1
+                        while not self._votes[next_index]:
+                            next_index += 1
+
+                        relevant_indices = [i, next_index]
                         votes_to_pop = self._how_many_to_pop(preceding,
-                                                             v + self._votes[i+1],
+                                                             v + self._votes[next_index],
                                                              self._votes_remaining)
                         k = votes_to_pop / 2
                         votes_to_pop = k * 2

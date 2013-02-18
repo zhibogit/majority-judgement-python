@@ -13,6 +13,7 @@ class TestMajorityJudgementSoundness:
         [2, 3],
         [2, 1, 3],
         [10, 1, 10],
+        [10, 0, 10],
         [1, 3, 2],
         [10],
         [9],
@@ -271,6 +272,7 @@ class TestMajorityJudgementSoundness:
     def test_compresses_two_cycles(self):
         assert len(list(MajorityJudgement([10, 10])._each_judgement())) == 1
         assert len(list(MajorityJudgement([9, 10])._each_judgement())) == 2
+        assert len(list(MajorityJudgement([10, 0, 10])._each_judgement())) == 1
 
     def test_does_not_contains_non_integer(self):
         x = MajorityJudgement([1,2,3])
