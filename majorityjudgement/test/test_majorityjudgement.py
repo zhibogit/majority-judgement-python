@@ -30,6 +30,12 @@ class TestMajorityJudgementSoundness:
         assert x == tallies
 
     @on_all_examples
+    def test_reverse_iteration_matches_list(self,x):
+        assert (list(reversed(MajorityJudgement(x))) == 
+                list(reversed(list(MajorityJudgement(x)))))
+        
+
+    @on_all_examples
     def test_not_less_than_self(self, x):
         assert MajorityJudgement(x) >= MajorityJudgement(x)
 

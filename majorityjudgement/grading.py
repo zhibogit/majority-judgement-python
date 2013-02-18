@@ -105,6 +105,13 @@ class MajorityJudgement:
                 for x in xs:
                     yield x
 
+    def __reversed__(self):
+        self._force_full_evaluation()
+        for (xs, n) in reversed(self._judgement_trail):
+            for _ in xrange(n):
+                for x in reversed(xs):
+                    yield x
+        
     def _compare(self, other):
         """
             Return an integer expressing the order relation between self and
@@ -201,3 +208,8 @@ class MajorityJudgement:
                     self._judgement_trail.append(r)
                     yield r
                     break
+
+    def _force_full_evaluation(self):
+        if self._votes:
+            for _ in self._each_judgement(): 
+                pass
