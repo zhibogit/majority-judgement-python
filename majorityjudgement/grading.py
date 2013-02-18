@@ -239,9 +239,7 @@ class MajorityJudgement(collections.Sequence):
                     yield r
                     break
 
-    def _force_full_evaluation(self, length=None):
-        if length == None: 
-            length = len(self)
+    def _force_full_evaluation(self):
         if self._votes:
             for _ in self._each_judgement(): 
                 pass

@@ -33,7 +33,12 @@ class TestMajorityJudgementSoundness:
     def test_reverse_iteration_matches_list(self,x):
         assert (list(reversed(MajorityJudgement(x))) == 
                 list(reversed(list(MajorityJudgement(x)))))
-        
+       
+    @on_all_examples
+    def test_reverse_iteration_is_idempotent(self, x):
+        xj = MajorityJudgement(x)
+        assert list(reversed(xj)) == list(reversed(xj))
+ 
 
     @on_all_examples
     def test_not_less_than_self(self, x):
@@ -299,6 +304,7 @@ class TestMajorityJudgementSoundness:
         ([1, 10, 1], 1, 8, 1),
         ([1, 1], 0, 10, 15),
         ([9, 1], 8, 10, None),
+        ([9, 1], 3, 1, None),
     ])
 
     @slicing_tests
