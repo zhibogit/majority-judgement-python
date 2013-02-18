@@ -32,14 +32,14 @@ class TestMajorityJudgementSoundness:
 
     @on_all_examples
     def test_reverse_iteration_matches_list(self,x):
-        assert (list(reversed(MajorityJudgement(x))) == 
+        assert (list(reversed(MajorityJudgement(x))) ==
                 list(reversed(list(MajorityJudgement(x)))))
-       
+
     @on_all_examples
     def test_reverse_iteration_is_idempotent(self, x):
         xj = MajorityJudgement(x)
         assert list(reversed(xj)) == list(reversed(xj))
- 
+
 
     @on_all_examples
     def test_not_less_than_self(self, x):
@@ -279,7 +279,6 @@ class TestMajorityJudgementSoundness:
         assert "foo" not in x
         list(x)
         assert "foo" not in x
-    
 
     def test_does_not_contain_negative_integer(self):
         x = MajorityJudgement([1,2,3])
@@ -299,7 +298,7 @@ class TestMajorityJudgementSoundness:
         list(x)
         assert 1 in x
 
-    
+
     slicing_tests = pytest.mark.parametrize(("x", "i", "j", "k"), [
         ([1, 1, 1, 1], 1, 5, 8),
         ([1, 1, 1, 1], 1, 8, 2),
