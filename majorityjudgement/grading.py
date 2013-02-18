@@ -80,7 +80,7 @@ class MajorityJudgement(collections.Sequence):
 
     def __getitem__(self, i):
         if isinstance(i, slice):
-            if i.stop <= i.start: 
+            if i.stop <= i.start:
                 return []
             ix = 0
             result = []
@@ -95,7 +95,7 @@ class MajorityJudgement(collections.Sequence):
         if not isinstance(i, int):
             raise TypeError(
                 "MajorityJudgement indices must be integers,"
-                " not %s" % type(i).__name__)    
+                " not %s" % type(i).__name__)
         l = len(self)
         if i < 0 and i > -l:
             i = i + l
@@ -131,9 +131,9 @@ class MajorityJudgement(collections.Sequence):
                     yield x
 
     def __contains__(self, x):
-        if not isinstance(x, int): 
+        if not isinstance(x, int):
             return False
-        if x < 0: 
+        if x < 0:
             return False
         if x < len(self._votes) and self._votes[x]:
             return True
@@ -141,7 +141,7 @@ class MajorityJudgement(collections.Sequence):
             if x in ys:
                 return True
         return False
-        
+
     def _compare(self, other):
         """
             Return an integer expressing the order relation between self and
@@ -167,7 +167,7 @@ class MajorityJudgement(collections.Sequence):
         while si.has_next() and oi.has_next():
             x, xn = si.next()
             y, yn = oi.next()
-            
+
             m = min(xn, yn)
 
             if x == y:
@@ -245,5 +245,5 @@ class MajorityJudgement(collections.Sequence):
 
     def _force_full_evaluation(self):
         if self._votes:
-            for _ in self._each_judgement(): 
+            for _ in self._each_judgement():
                 pass
