@@ -234,11 +234,6 @@ class MajorityJudgement(collections.Sequence):
                                                              self._votes_remaining)
                         k = votes_to_pop / 2
                         votes_to_pop = k * 2
-
-                        if k == 0:
-                            relevant_indices = [i]
-                            k = 1
-                            votes_to_pop = 1
                     else:
                         relevant_indices = [i]
                         votes_to_pop = self._how_many_to_pop(preceding,
