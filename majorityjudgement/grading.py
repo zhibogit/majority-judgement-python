@@ -79,7 +79,7 @@ class MajorityJudgement(collections.Sequence):
         return self._length
 
     def __getitem__(self, i):
-        if type(i) is slice:
+        if isinstance(i, slice):
             if i.stop <= i.start: 
                 return []
             ix = 0
@@ -92,7 +92,7 @@ class MajorityJudgement(collections.Sequence):
                     break
             return result
 
-        if type(i) is not int:
+        if not isinstance(i, int):
             raise TypeError(
                 "MajorityJudgement indices must be integers,"
                 " not %s" % type(i).__name__)    
@@ -131,7 +131,8 @@ class MajorityJudgement(collections.Sequence):
                     yield x
 
     def __contains__(self, x):
-        if not type(x) is int: return False
+        if not isinstance(x, int): 
+            return False
         if x < 0: 
             return False
         if x < len(self._votes) and self._votes[x]:
