@@ -248,6 +248,10 @@ class TestMajorityJudgementSoundness:
         with pytest.raises(IndexError):
             MajorityJudgement([1, 2, 3])[-6]
 
+    def test_index_is_not_int(self):
+        with pytest.raises(TypeError):
+            MajorityJudgement([1, 2, 3])["foo"]
+
     @on_all_examples
     def test_run_length_encoding(self, x):
         xj = MajorityJudgement(x)
@@ -287,3 +291,22 @@ class TestMajorityJudgementSoundness:
         assert 1 in x
         list(x)
         assert 1 in x
+
+    
+    slicing_tests = pytest.mark.parametrize(("x", "i", "j", "k"), [
+        ([1, 1, 1, 1], 1, 5, 8),
+        ([1, 1, 1, 1], 1, 8, 2),
+        ([1, 10, 1], 1, 8, 1),
+        ([1, 1], 0, 10, 15),
+        ([9, 1], 8, 10, None),
+    ])
+
+    @slicing_tests
+    def test_slicing_unevaluated(self, x,i,j,k):
+        assert list(MajorityJudgement(x)[i:j:k]) == list(MajorityJudgement(x))[i:j:k]
+
+    @slicing_tests
+    def test_slicing_evaluated(self, x,i,j,k):
+        xj = MajorityJudgement(x)
+        list(xj)
+        assert list(xj[i:j:k]) == list(xj)[i:j:k]

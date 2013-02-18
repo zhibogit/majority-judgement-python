@@ -78,6 +78,23 @@ class MajorityJudgement:
         return self._length
 
     def __getitem__(self, i):
+        if type(i) is slice:
+            if i.stop <= i.start: 
+                return []
+            ix = 0
+            result = []
+            for x in self:
+                if ix >= i.start and (ix - i.start) % (i.step or 1) == 0:
+                    result.append(x)
+                ix += 1
+                if ix >= i.stop:
+                    break
+            return result
+
+        if type(i) is not int:
+            raise TypeError(
+                "MajorityJudgement indices must be integers,"
+                " not %s" % type(i).__name__)    
         l = len(self)
         if i < 0 and i > -l:
             i = i + l
@@ -220,7 +237,9 @@ class MajorityJudgement:
                     yield r
                     break
 
-    def _force_full_evaluation(self):
+    def _force_full_evaluation(self, length=None):
+        if length == None: 
+            length = len(self)
         if self._votes:
             for _ in self._each_judgement(): 
                 pass
