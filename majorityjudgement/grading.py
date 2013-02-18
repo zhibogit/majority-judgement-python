@@ -34,8 +34,9 @@ procedure by assigning each candidate their tally and taking the maximum.
 """
 
 from pushback_generator import PushbackGenerator
+import collections
 
-class MajorityJudgement:
+class MajorityJudgement(collections.Sequence):
     """
     Objects of type MajorityJudgement behave like a lazily evaluated frozen
     list. They may be indexed, iterated over and _compared exactly as if they
