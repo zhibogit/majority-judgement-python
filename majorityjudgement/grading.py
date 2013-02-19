@@ -103,7 +103,9 @@ class MajorityJudgement(collections.Sequence):
         if isinstance(tally, MajorityJudgement):
             raise TypeError("tally argument may not be of type "
                             "MajorityJudgement. It's basically impossible that"
-                            " this is really what you meant to do")
+                            " this is really what you meant to do. If you"
+                            " really wanted to do that, convert it to a list" 
+                            " first. Else pass it as the votes argument")
 
         if votes:
             if isinstance(votes, MajorityJudgement):
