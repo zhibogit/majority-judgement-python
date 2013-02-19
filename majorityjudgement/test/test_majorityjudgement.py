@@ -227,17 +227,9 @@ class TestMajorityJudgementSoundness:
         assert by_mj == by_list
 
     @on_all_examples
-    def test_repr_does_not_evaluate(self, x):
+    def test_repr_does_not_error(self, x):
         x = MajorityJudgement(x)
         repr(x)
-        assert len(x._judgement_trail) == 0
-
-    @on_all_examples
-    def test_repr_reflects_evaluation(self, x):
-        x = MajorityJudgement(x)
-        o = repr(x)
-        list(x)
-        assert repr(x) != o
 
     def test_empty_behaviour(self):
         assert MajorityJudgement([]) == MajorityJudgement([])
@@ -279,12 +271,12 @@ class TestMajorityJudgementSoundness:
             if last_x != v:
                 last_x = v
                 rlel  = rlel + 1
-        assert len(list(xj._each_judgement())) <= rlel
+        assert len(list(xj._judgement_trail)) <= rlel
 
     def test_compresses_two_cycles(self):
-        assert len(list(MajorityJudgement([10, 10])._each_judgement())) == 1
-        assert len(list(MajorityJudgement([9, 10])._each_judgement())) == 2
-        assert len(list(MajorityJudgement([10, 0, 10])._each_judgement())) == 1
+        assert len(list(MajorityJudgement([10, 10])._judgement_trail)) == 1
+        assert len(list(MajorityJudgement([9, 10])._judgement_trail)) == 2
+        assert len(list(MajorityJudgement([10, 0, 10])._judgement_trail)) == 1
 
     def test_does_not_contains_non_integer(self):
         x = MajorityJudgement([1,2,3])
@@ -352,10 +344,3 @@ class TestMajorityJudgementSoundness:
     def test_deep_copy_equals_self(self, x):
         xj = MajorityJudgement(x)
         assert xj == copy.deepcopy(xj)
-
-    @on_all_examples
-    def test_copy_results_in_indepenence(self, x):
-        xj = MajorityJudgement(x)
-        xj2 = copy.copy(xj)
-        list(xj2)
-        assert not xj._judgement_trail

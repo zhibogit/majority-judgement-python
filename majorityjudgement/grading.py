@@ -37,6 +37,51 @@ from pushback_generator import PushbackGenerator
 import collections
 import copy
 
+def _how_many_to_pop(preceding, votes, total):
+    return 1 + min(total - 2 * preceding - 1,
+                   2 * preceding + 2 * votes - total)
+
+def _calculate_judgement_trail(tallies):
+    judgement_trail = []
+    tallies = list(tallies)
+    tallies_remaining = sum(tallies)
+    while len(tallies) > 0:
+        tot = 0
+        for i in xrange(len(tallies)):  # pragma: no branch
+            preceding = tot
+            v = tallies[i]
+            tot += v
+            if 2 * tot >= tallies_remaining:
+                if 2 * tot == tallies_remaining:
+                    next_index = i+1
+                    while not tallies[next_index]:
+                        next_index += 1
+
+                    relevant_indices = [i, next_index]
+                    votes_to_pop = _how_many_to_pop(preceding,
+                                                    v + tallies[next_index],
+                                                    tallies_remaining)
+                    k = votes_to_pop / 2
+                    votes_to_pop = k * 2
+                else:
+                    relevant_indices = [i]
+                    votes_to_pop = _how_many_to_pop(preceding,
+                                                    v,
+                                                    tallies_remaining)
+                    k = votes_to_pop
+
+                tallies_remaining -= votes_to_pop
+                for i in relevant_indices:
+                    tallies[i] -= k
+
+                while len(tallies) > 0 and tallies[-1] <= 0:
+                    tallies.pop()
+                r = [relevant_indices, k]
+                judgement_trail.append(r)
+                break
+    return judgement_trail
+
+
 class MajorityJudgement(collections.Sequence):
     """
     Objects of type MajorityJudgement behave like a lazily evaluated frozen
@@ -63,8 +108,6 @@ class MajorityJudgement(collections.Sequence):
         if votes:
             if isinstance(votes, MajorityJudgement):
                 self._length = votes._length
-                self._votes = copy.copy(votes._votes)
-                self._votes_remaining = votes._votes_remaining
                 self._judgement_trail = copy.deepcopy(votes._judgement_trail)
                 return
             else:
@@ -73,12 +116,10 @@ class MajorityJudgement(collections.Sequence):
                     tally[x] += 1
 
         self._length = sum(tally)
-        self._votes = list(tally)
-        self._votes_remaining = sum(tally)
-        self._judgement_trail = []
+        self._judgement_trail = _calculate_judgement_trail(tally)
 
     def __repr__(self):
-        return "MajorityJudgement(%s, %s)" % (self._judgement_trail, self._votes)
+        return "MajorityJudgement(%s)" % (self._judgement_trail)
 
     def __eq__(self, other):
         return self._compare(other) == 0
@@ -124,7 +165,7 @@ class MajorityJudgement(collections.Sequence):
             i = i + l
         elif i < 0 or i >= l:
             raise IndexError("Index %d out of range [0, %d)", i, len(self))
-        for x, n in self._each_judgement():    # pragma: no branch
+        for x, n in self._judgement_trail:    # pragma: no branch
             m = n * len(x)
             if i < m:
                 return x[i % len(x)]
@@ -141,13 +182,12 @@ class MajorityJudgement(collections.Sequence):
             "the contents")
 
     def __iter__(self):
-        for (xs, n) in self._each_judgement():
+        for (xs, n) in self._judgement_trail:
             for _ in xrange(n):
                 for x in xs:
                     yield x
 
     def __reversed__(self):
-        self._force_full_evaluation()
         for (xs, n) in reversed(self._judgement_trail):
             for _ in xrange(n):
                 for x in reversed(xs):
@@ -158,8 +198,6 @@ class MajorityJudgement(collections.Sequence):
             return False
         if x < 0:
             return False
-        if x < len(self._votes) and self._votes[x]:
-            return True
         for (ys, n) in self._judgement_trail:
             if x in ys:
                 return True
@@ -190,8 +228,8 @@ class MajorityJudgement(collections.Sequence):
         if len(other) == 0:
             return 1
 
-        si = PushbackGenerator(self._each_judgement())
-        oi = PushbackGenerator(other._each_judgement())
+        si = PushbackGenerator(self._judgement_trail)
+        oi = PushbackGenerator(other._judgement_trail)
 
         while si.has_next() and oi.has_next():
             x, xn = si.next()
@@ -222,52 +260,3 @@ class MajorityJudgement(collections.Sequence):
         if oi.has_next(): return -1
 
         return 0
-
-    def _how_many_to_pop(self, preceding, votes, total):
-        return 1 + min(total - 2 * preceding - 1,
-                       2 * preceding + 2 * votes - total)
-
-    def _each_judgement(self):
-        for x in self._judgement_trail:
-            yield x
-        while len(self._votes) > 0:
-            assert sum(self._votes) == self._votes_remaining
-            tot = 0
-            for i in xrange(len(self._votes)):  # pragma: no branch
-                preceding = tot
-                v = self._votes[i]
-                tot += v
-                if 2 * tot >= self._votes_remaining:
-                    if 2 * tot == self._votes_remaining:
-                        next_index = i+1
-                        while not self._votes[next_index]:
-                            next_index += 1
-
-                        relevant_indices = [i, next_index]
-                        votes_to_pop = self._how_many_to_pop(preceding,
-                                                             v + self._votes[next_index],
-                                                             self._votes_remaining)
-                        k = votes_to_pop / 2
-                        votes_to_pop = k * 2
-                    else:
-                        relevant_indices = [i]
-                        votes_to_pop = self._how_many_to_pop(preceding,
-                                                             v,
-                                                             self._votes_remaining)
-                        k = votes_to_pop
-
-                    self._votes_remaining -= votes_to_pop
-                    for i in relevant_indices:
-                        self._votes[i] -= k
-
-                    while len(self._votes) > 0 and self._votes[-1] <= 0:
-                        self._votes.pop()
-                    r = [relevant_indices, k]
-                    self._judgement_trail.append(r)
-                    yield r
-                    break
-
-    def _force_full_evaluation(self):
-        if self._votes:
-            for _ in self._each_judgement():
-                pass
