@@ -43,7 +43,7 @@ class MajorityJudgement(collections.Sequence):
     list. They may be indexed, iterated over and _compared exactly as if they
     were their list of majority judgement grades.
     """
-    def __init__(self, votes):
+    def __init__(self, tally=None, votes=None):
         """
         Create a MajorityJudgement object from a tally of grades. Note that
         the votes are taken as tallies, not as a list of grades. i.e.
@@ -51,16 +51,31 @@ class MajorityJudgement(collections.Sequence):
         of grade 1, not that there 2 votes of grade 1 and 1 of grade 2.
         """
 
-        if isinstance(votes, MajorityJudgement):
-            self._length = votes._length
-            self._votes = copy.copy(votes._votes)
-            self._votes_remaining = votes._votes_remaining
-            self._judgement_trail = copy.deepcopy(votes._judgement_trail)
-        else:
-            self._length = sum(votes)
-            self._votes = list(votes)
-            self._votes_remaining = sum(votes)
-            self._judgement_trail = []
+        if tally and votes:
+            raise StandardError("Invalid arguments: Cannot provide both tally"
+                                "and votes")
+
+        if isinstance(tally, MajorityJudgement):
+            raise TypeError("tally argument may not be of type "
+                            "MajorityJudgement. It's basically impossible that"
+                            " this is really what you meant to do")
+
+        if votes:
+            if isinstance(votes, MajorityJudgement):
+                self._length = votes._length
+                self._votes = copy.copy(votes._votes)
+                self._votes_remaining = votes._votes_remaining
+                self._judgement_trail = copy.deepcopy(votes._judgement_trail)
+                return
+            else:
+                tally = [0 for _ in xrange(max(votes) + 1)]
+                for x in votes:
+                    tally[x] += 1
+
+        self._length = sum(tally)
+        self._votes = list(tally)
+        self._votes_remaining = sum(tally)
+        self._judgement_trail = []
 
     def __repr__(self):
         return "MajorityJudgement(%s, %s)" % (self._judgement_trail, self._votes)
@@ -151,7 +166,7 @@ class MajorityJudgement(collections.Sequence):
         return False
 
     def __copy__(self):
-        return MajorityJudgement(self)
+        return MajorityJudgement(votes=self)
 
     def __deepcopy__(self, _):
         return self.__copy__()

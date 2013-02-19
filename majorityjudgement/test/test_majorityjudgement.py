@@ -23,6 +23,18 @@ class TestMajorityJudgementSoundness:
 
     on_all_examples = pytest.mark.parametrize("x", example_votes)
 
+    def test_raises_error_with_bad_arguments(self):
+        with pytest.raises(StandardError):
+            MajorityJudgement(tally=[1], votes=[1])
+        
+        with pytest.raises(TypeError):
+            MajorityJudgement(tally=MajorityJudgement([1]))
+
+    @on_all_examples
+    def test_creates_same_majority_judgement_from_list(self, x):
+        y = MajorityJudgement(x) 
+        assert y == MajorityJudgement(votes=list(y))
+
     @on_all_examples
     def test_tallies(self, x):
         tallies = [0 for _ in x]
