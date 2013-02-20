@@ -54,8 +54,11 @@ class TestMajorityJudgementSoundness:
     @on_all_examples
     def test_front_loading_moves_earlier(self, x):
         for i in xrange(1, len(x)):
+            
             y = list(x)
             y[i] = y[i] - 1
+            if y[i] < 0:
+                continue
             y[i-1] = y[i-1] + 1
             assert MajorityJudgement(y) < MajorityJudgement(x)
 
@@ -165,19 +168,3 @@ class TestMajorityJudgementSoundness:
         assert MajorityJudgement([]) == MajorityJudgement([])
         assert MajorityJudgement([]) < MajorityJudgement([1])
         assert MajorityJudgement([1]) > MajorityJudgement([])
-
-    @on_all_examples
-    def test_run_length_encoding(self, x):
-        xj = MajorityJudgement(x)
-        last_x = None
-        rlel = 0
-        for v in naive_majority_judgement(x):
-            if last_x != v:
-                last_x = v
-                rlel  = rlel + 1
-        assert len(list(xj._judgement_trail)) <= rlel
-
-    def test_compresses_two_cycles(self):
-        assert len(list(MajorityJudgement([10, 10])._judgement_trail)) == 1
-        assert len(list(MajorityJudgement([9, 10])._judgement_trail)) == 2
-        assert len(list(MajorityJudgement([10, 0, 10])._judgement_trail)) == 1

@@ -95,6 +95,10 @@ class MajorityJudgement():
         of grade 1, not that there 2 votes of grade 1 and 1 of grade 2.
         """
 
+        for x in tally:
+            if x < 0:
+                raise ValueError("Tally counts may not be negative: %s" % tally)
+
         self._judgement_trail = _calculate_judgement_trail(tally)
 
     def __repr__(self):
