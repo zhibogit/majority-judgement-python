@@ -87,33 +87,13 @@ class MajorityJudgement():
     list. They may be indexed, iterated over and _compared exactly as if they
     were their list of majority judgement grades.
     """
-    def __init__(self, tally=None, votes=None):
+    def __init__(self, tally):
         """
         Create a MajorityJudgement object from a tally of grades. Note that
         the votes are taken as tallies, not as a list of grades. i.e.
         [1,2,1] means that there is one vote each of grades 0 and 2 and 2 votes
         of grade 1, not that there 2 votes of grade 1 and 1 of grade 2.
         """
-
-        if tally and votes:
-            raise StandardError("Invalid arguments: Cannot provide both tally"
-                                "and votes")
-
-        if isinstance(tally, MajorityJudgement):
-            raise TypeError("tally argument may not be of type "
-                            "MajorityJudgement. It's basically impossible that"
-                            " this is really what you meant to do. If you"
-                            " really wanted to do that, convert it to a list" 
-                            " first. Else pass it as the votes argument")
-
-        if votes:
-            if isinstance(votes, MajorityJudgement):
-                self._judgement_trail = copy.deepcopy(votes._judgement_trail)
-                return
-            else:
-                tally = [0 for _ in xrange(max(votes) + 1)]
-                for x in votes:
-                    tally[x] += 1
 
         self._judgement_trail = _calculate_judgement_trail(tally)
 
@@ -137,12 +117,6 @@ class MajorityJudgement():
 
     def __ge__(self, other):
         return self._compare(other) >= 0
-
-    def __copy__(self):
-        return MajorityJudgement(votes=self)
-
-    def __deepcopy__(self, _):
-        return self.__copy__()
 
     def _compare(self, other):
         """

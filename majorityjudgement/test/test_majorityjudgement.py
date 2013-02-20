@@ -2,7 +2,6 @@ from majorityjudgement import MajorityJudgement
 from majorityjudgement.grading import _calculate_judgement_trail
 import pytest
 import re
-import copy
 import operator
 
 def naive_majority_judgement(tally):
@@ -47,26 +46,6 @@ class TestMajorityJudgementSoundness:
     def test_everything_makes_it_into_judgement(self,x):
         jt = _calculate_judgement_trail(x)
         assert sum(x) == sum((len(x) * n for (x, n) in jt))
-
-    def test_raises_error_with_bad_arguments(self):
-        with pytest.raises(StandardError):
-            MajorityJudgement(tally=[1], votes=[1])
-        
-        with pytest.raises(TypeError):
-            MajorityJudgement(tally=MajorityJudgement([1]))
-
-    @on_all_examples
-    def test_creates_same_majority_judgement_from_list(self, x):
-        y = MajorityJudgement(x) 
-        assert y == MajorityJudgement(votes=naive_majority_judgement(x))
-
-    @on_all_examples
-    def test_tallies(self, x):
-        tallies = [0 for _ in x]
-        for ys, yn in MajorityJudgement(x)._judgement_trail:
-            for y in ys:
-                tallies[y] = tallies[y] + yn
-        assert x == tallies
 
     @on_all_examples
     def test_not_less_than_self(self, x):
@@ -202,13 +181,3 @@ class TestMajorityJudgementSoundness:
         assert len(list(MajorityJudgement([10, 10])._judgement_trail)) == 1
         assert len(list(MajorityJudgement([9, 10])._judgement_trail)) == 2
         assert len(list(MajorityJudgement([10, 0, 10])._judgement_trail)) == 1
-
-    @on_all_examples
-    def test_copy_equals_self(self, x):
-        xj = MajorityJudgement(x)
-        assert xj == copy.copy(xj)
-    
-    @on_all_examples
-    def test_deep_copy_equals_self(self, x):
-        xj = MajorityJudgement(x)
-        assert xj == copy.deepcopy(xj)
