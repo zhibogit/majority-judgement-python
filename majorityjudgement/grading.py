@@ -81,7 +81,7 @@ def _calculate_judgement_trail(tallies):
     return judgement_trail
 
 
-class MajorityJudgement(collections.Sequence):
+class MajorityJudgement():
     """
     Objects of type MajorityJudgement behave like a lazily evaluated frozen
     list. They may be indexed, iterated over and _compared exactly as if they
@@ -108,7 +108,6 @@ class MajorityJudgement(collections.Sequence):
 
         if votes:
             if isinstance(votes, MajorityJudgement):
-                self._length = votes._length
                 self._judgement_trail = copy.deepcopy(votes._judgement_trail)
                 return
             else:
@@ -116,7 +115,6 @@ class MajorityJudgement(collections.Sequence):
                 for x in votes:
                     tally[x] += 1
 
-        self._length = sum(tally)
         self._judgement_trail = _calculate_judgement_trail(tally)
 
     def __repr__(self):
@@ -140,70 +138,6 @@ class MajorityJudgement(collections.Sequence):
     def __ge__(self, other):
         return self._compare(other) >= 0
 
-    def __len__(self):
-        return self._length
-
-    def __getitem__(self, i):
-        if isinstance(i, slice):
-            if i.stop <= i.start:
-                return []
-            ix = 0
-            result = []
-            for x in self:
-                if ix >= i.start and (ix - i.start) % (i.step or 1) == 0:
-                    result.append(x)
-                ix += 1
-                if ix >= i.stop:
-                    break
-            return result
-
-        if not isinstance(i, int):
-            raise TypeError(
-                "MajorityJudgement indices must be integers,"
-                " not %s" % type(i).__name__)
-        l = len(self)
-        if i < 0 and i > -l:
-            i = i + l
-        elif i < 0 or i >= l:
-            raise IndexError("Index %d out of range [0, %d)", i, len(self))
-        for x, n in self._judgement_trail:    # pragma: no branch
-            m = n * len(x)
-            if i < m:
-                return x[i % len(x)]
-            i = i - m
-
-    def __delitem__(self, i):
-        raise TypeError(
-            "MajorityJudgement objects do not support modifying"
-            "the contents")
-
-    def __setitem__(self, i, x):
-        raise TypeError(
-            "MajorityJudgement objects do not support modifying"
-            "the contents")
-
-    def __iter__(self):
-        for (xs, n) in self._judgement_trail:
-            for _ in xrange(n):
-                for x in xs:
-                    yield x
-
-    def __reversed__(self):
-        for (xs, n) in reversed(self._judgement_trail):
-            for _ in xrange(n):
-                for x in reversed(xs):
-                    yield x
-
-    def __contains__(self, x):
-        if not isinstance(x, int):
-            return False
-        if x < 0:
-            return False
-        for (ys, n) in self._judgement_trail:
-            if x in ys:
-                return True
-        return False
-
     def __copy__(self):
         return MajorityJudgement(votes=self)
 
@@ -222,11 +156,11 @@ class MajorityJudgement(collections.Sequence):
         """
         if self is other:
             return 0
-        if len(self) == 0 and len(other) == 0:
+        if not self._judgement_trail and not other._judgement_trail:
             return 0
-        if len(self) == 0:
+        if not self._judgement_trail:
             return -1
-        if len(other) == 0:
+        if not other._judgement_trail:
             return 1
 
         self_stack = list(reversed(self._judgement_trail))

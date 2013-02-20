@@ -3,6 +3,25 @@ from majorityjudgement.grading import _calculate_judgement_trail
 import pytest
 import re
 import copy
+import operator
+
+def naive_majority_judgement(tally):
+    tally = list(tally)
+    result = []
+    tot = sum(tally)
+
+    while tot:
+        rt = 0
+        for i in xrange(len(tally)):
+            rt += tally[i]
+            if rt * 2 >= tot:
+                tot -= 1
+                tally[i] -= 1
+                result.append(i)
+                break
+
+    return result
+    
 
 class TestMajorityJudgementSoundness:
     example_votes = [
@@ -39,25 +58,15 @@ class TestMajorityJudgementSoundness:
     @on_all_examples
     def test_creates_same_majority_judgement_from_list(self, x):
         y = MajorityJudgement(x) 
-        assert y == MajorityJudgement(votes=list(y))
+        assert y == MajorityJudgement(votes=naive_majority_judgement(x))
 
     @on_all_examples
     def test_tallies(self, x):
         tallies = [0 for _ in x]
-        for i in MajorityJudgement(x):
-            tallies[i] = tallies[i] + 1
+        for ys, yn in MajorityJudgement(x)._judgement_trail:
+            for y in ys:
+                tallies[y] = tallies[y] + yn
         assert x == tallies
-
-    @on_all_examples
-    def test_reverse_iteration_matches_list(self,x):
-        assert (list(reversed(MajorityJudgement(x))) ==
-                list(reversed(list(MajorityJudgement(x)))))
-
-    @on_all_examples
-    def test_reverse_iteration_is_idempotent(self, x):
-        xj = MajorityJudgement(x)
-        assert list(reversed(xj)) == list(reversed(xj))
-
 
     @on_all_examples
     def test_not_less_than_self(self, x):
@@ -77,18 +86,6 @@ class TestMajorityJudgementSoundness:
         assert x == x
 
     @on_all_examples
-    def test_equals_self_when_fully_evaluated(self, x):
-        x1 = MajorityJudgement(x)
-        x2 = MajorityJudgement(x)
-        list(x1)
-        assert x1 == x2
-
-    @on_all_examples
-    def test_calling_list_twice_produces_same_result(self, x):
-        x = MajorityJudgement(x)
-        assert list(x) == list(x)
-
-    @on_all_examples
     def test_equality_of_identical_inputs(self, x):
         assert MajorityJudgement(x) == MajorityJudgement(x)
 
@@ -105,45 +102,6 @@ class TestMajorityJudgementSoundness:
         assert (MajorityJudgement(x)._compare(MajorityJudgement(y)) ==
                 -MajorityJudgement(y)._compare(MajorityJudgement(x)))
 
-    @on_all_examples
-    def test_length_agrees_with_list(self, x):
-        assert len(MajorityJudgement(x)) == len(list(MajorityJudgement(x)))
-
-    @on_all_examples
-    def test_length_agrees_with_list_when_evaluated(self, x):
-        x = MajorityJudgement(x)
-        y = list(x)
-        assert len(x) == len(y)
-
-    @on_all_examples
-    def test_correct_number(self, x):
-        total = sum(x)
-        assert len(list(MajorityJudgement(x))) == total
-
-    @on_all_examples
-    def test_positive_index_matches_list_index(self, x):
-        y = list(MajorityJudgement(x))
-        x = MajorityJudgement(x)
-
-        for i in xrange(len(y)):
-            assert x[i] == y[i]
-
-    @on_all_examples
-    def test_negative_index_matches_list_index(self, x):
-        y = list(MajorityJudgement(x))
-        x = MajorityJudgement(x)
-
-        for i in xrange(len(y)):
-            assert x[-i] == y[-i]
-
-    @pytest.mark.parametrize(("x", "m"), [
-        ([1, 1, 1, 1], 1),
-        ([5, 1, 1, 5], 1),
-        ([5, 1, 1, 6], 2),
-        ([1, 1, 1, 1, 20], 4)
-    ])
-    def test_starts_with_median(self, x, m):
-        assert MajorityJudgement(x)[0] == m
 
     @pytest.mark.parametrize(
         ("x", "y", "k"),
@@ -189,9 +147,8 @@ class TestMajorityJudgementSoundness:
         (2, 10)
     ])
     def test_single_upvote_comes_last(self, k, n):
-        x = self.build_single_upvote(k, n)
-        l = list(MajorityJudgement(x))
-        assert l == [0 for _ in xrange(k)] + [n]
+        x = MajorityJudgement(self.build_single_upvote(k, n))
+        assert x._judgement_trail[-1][0][-1] == n
 
     @pytest.mark.parametrize(("k", "m", "n"), [
         (10, 1, 5),
@@ -212,25 +169,13 @@ class TestMajorityJudgementSoundness:
         ([5, 5], [10, 10])
     ])
 
-    @order_tests
-    def test_on_specified_pairs_unevaluated(self, x, y):
-        assert MajorityJudgement(x) < MajorityJudgement(y)
-        assert MajorityJudgement(y) > MajorityJudgement(x)
-
-    @order_tests
-    def test_on_specified_pairs_fully_evaluated(self, x, y):
-        xe = MajorityJudgement(x)
-        ye = MajorityJudgement(y)
-        list(xe)
-        list(ye)
-        assert xe < ye
-        assert ye > xe
-
     @pytest.mark.parametrize(("ev"), [example_votes])
     def test_sorts_like_corresponding_lists(self, ev):
-        by_mj = [list(x) for x in sorted([MajorityJudgement(y) for y in ev])]
-        by_list = sorted([list(MajorityJudgement(y)) for y in ev])
-        assert by_mj == by_list
+        blah = [ (i, MajorityJudgement(x), 
+                 naive_majority_judgement(x)) 
+                 for i, x in zip(range(len(ev)),ev)]
+
+        assert sorted(blah,key=operator.itemgetter(1)) == sorted(blah,key=operator.itemgetter(2))
 
     @on_all_examples
     def test_repr_does_not_error(self, x):
@@ -242,38 +187,12 @@ class TestMajorityJudgementSoundness:
         assert MajorityJudgement([]) < MajorityJudgement([1])
         assert MajorityJudgement([1]) > MajorityJudgement([])
 
-    def test_no_delete(self):
-        x = MajorityJudgement([1, 2, 3])
-        l = list(x)
-        with pytest.raises(TypeError) as excinfo:
-            del x[0]
-        assert re.search('not support modifying', excinfo.value.message)
-        assert list(x) == l
-
-    def test_no_set(self):
-        x = MajorityJudgement([1, 2, 3])
-        l = list(x)
-        with pytest.raises(TypeError) as excinfo:
-            x[0] = 15
-        assert re.search('not support modifying', excinfo.value.message)
-        assert list(x) == l
-
-    def test_index_out_of_bounds(self):
-        with pytest.raises(IndexError):
-            MajorityJudgement([1, 2, 3])[6]
-        with pytest.raises(IndexError):
-            MajorityJudgement([1, 2, 3])[-6]
-
-    def test_index_is_not_int(self):
-        with pytest.raises(TypeError):
-            MajorityJudgement([1, 2, 3])["foo"]
-
     @on_all_examples
     def test_run_length_encoding(self, x):
         xj = MajorityJudgement(x)
         last_x = None
         rlel = 0
-        for v in xj:
+        for v in naive_majority_judgement(x):
             if last_x != v:
                 last_x = v
                 rlel  = rlel + 1
@@ -284,63 +203,6 @@ class TestMajorityJudgementSoundness:
         assert len(list(MajorityJudgement([9, 10])._judgement_trail)) == 2
         assert len(list(MajorityJudgement([10, 0, 10])._judgement_trail)) == 1
 
-    def test_does_not_contains_non_integer(self):
-        x = MajorityJudgement([1,2,3])
-        assert "foo" not in x
-        list(x)
-        assert "foo" not in x
-
-    def test_does_not_contain_negative_integer(self):
-        x = MajorityJudgement([1,2,3])
-        assert -1 not in x
-        list(x)
-        assert -1 not in x
-
-    def test_does_not_contain_zero_vote(self):
-        x = MajorityJudgement([1,0,3])
-        assert 1 not in x
-        list(x)
-        assert 1 not in x
-
-    def test_asserts_contain_non_zero_results(self):
-        x = MajorityJudgement([1,1,3])
-        assert 1 in x
-        list(x)
-        assert 1 in x
-
-
-    slicing_tests = pytest.mark.parametrize(("x", "i", "j", "k"), [
-        ([1, 1, 1, 1], 1, 5, 8),
-        ([1, 1, 1, 1], 1, 8, 2),
-        ([1, 10, 1], 1, 8, 1),
-        ([1, 1], 0, 10, 15),
-        ([9, 1], 8, 10, None),
-        ([9, 1], 3, 1, None),
-    ])
-
-    @slicing_tests
-    def test_slicing_unevaluated(self, x,i,j,k):
-        assert list(MajorityJudgement(x)[i:j:k]) == list(MajorityJudgement(x))[i:j:k]
-
-    @slicing_tests
-    def test_slicing_evaluated(self, x,i,j,k):
-        xj = MajorityJudgement(x)
-        list(xj)
-        assert list(xj[i:j:k]) == list(xj)[i:j:k]
-
-    @on_all_examples
-    def test_copy(self, x):
-        xj = MajorityJudgement(x)
-        xj2 = copy.copy(xj)
-        assert list(xj) == list(xj2)
-
-    @on_all_examples
-    def test_copy_on_evaluated(self, x):
-        xj = MajorityJudgement(x)
-        list(xj)
-        xj2 = copy.copy(xj)
-        assert list(xj) == list(xj2)
-    
     @on_all_examples
     def test_copy_equals_self(self, x):
         xj = MajorityJudgement(x)
