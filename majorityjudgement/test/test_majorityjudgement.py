@@ -1,4 +1,5 @@
 from majorityjudgement import MajorityJudgement
+from majorityjudgement.grading import _calculate_judgement_trail
 import pytest
 import re
 import copy
@@ -22,6 +23,11 @@ class TestMajorityJudgementSoundness:
     ]
 
     on_all_examples = pytest.mark.parametrize("x", example_votes)
+
+    @on_all_examples
+    def test_everything_makes_it_into_judgement(self,x):
+        jt = _calculate_judgement_trail(x)
+        assert sum(x) == sum((len(x) * n for (x, n) in jt))
 
     def test_raises_error_with_bad_arguments(self):
         with pytest.raises(StandardError):
