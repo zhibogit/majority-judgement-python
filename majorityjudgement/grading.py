@@ -238,24 +238,27 @@ class MajorityJudgement(collections.Sequence):
 
             m = min(xn, yn)
 
-            if x == y:
-                xn = xn - m
-                yn = yn - m
-                if xn: self_stack.append((x, xn))
-                if yn: other_stack.append((y, yn))
-            elif x[:m] < y[:m]:
+            if x[0] < y[0]:
                 return -1
-            elif y[:m] < x[:m]:
+            elif y[0] < x[0]:
                 return 1
+            elif len(x) == len(y):
+                if len(x) == 2:
+                    if x[1] < y[1]:
+                        return -1
+                    elif y[1] < x[1]:
+                        return 1
+            
+                if xn > yn:
+                    self_stack.append((x, xn - yn))
+                elif yn > xn:
+                    other_stack.append((y, yn - xn))
             else:
                 if xn > 1: self_stack.append((x, xn - 1))
                 if yn > 1: other_stack.append((y, yn - 1))
 
-                x = x[m:]
-                y = y[m:]
-
-                if x: self_stack.append((x, 1))
-                if y: other_stack.append((y, 1))
+                if len(x) > 1: self_stack.append(([x[1]], 1))
+                else: other_stack.append(([y[1]], 1))
 
         if self_stack: return 1
         if other_stack: return -1
