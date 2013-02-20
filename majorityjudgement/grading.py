@@ -33,7 +33,6 @@ in terms of the majority judgement. It may then be used to implement a voting
 procedure by assigning each candidate their tally and taking the maximum.
 """
 
-from pushback_generator import PushbackGenerator
 import collections
 import copy
 
@@ -230,35 +229,35 @@ class MajorityJudgement(collections.Sequence):
         if len(other) == 0:
             return 1
 
-        si = PushbackGenerator(self._judgement_trail)
-        oi = PushbackGenerator(other._judgement_trail)
+        self_stack = list(reversed(self._judgement_trail))
+        other_stack = list(reversed(other._judgement_trail))
 
-        while si.has_next() and oi.has_next():
-            x, xn = si.next()
-            y, yn = oi.next()
+        while self_stack and other_stack:
+            x, xn = self_stack.pop()
+            y, yn = other_stack.pop()
 
             m = min(xn, yn)
 
             if x == y:
                 xn = xn - m
                 yn = yn - m
-                if xn: si.push_back((x, xn))
-                if yn: oi.push_back((y, yn))
+                if xn: self_stack.append((x, xn))
+                if yn: other_stack.append((y, yn))
             elif x[:m] < y[:m]:
                 return -1
             elif y[:m] < x[:m]:
                 return 1
             else:
-                if xn > 1: si.push_back((x, xn - 1))
-                if yn > 1: oi.push_back((y, yn - 1))
+                if xn > 1: self_stack.append((x, xn - 1))
+                if yn > 1: other_stack.append((y, yn - 1))
 
                 x = x[m:]
                 y = y[m:]
 
-                if x: si.push_back((x, 1))
-                if y: oi.push_back((y, 1))
+                if x: self_stack.append((x, 1))
+                if y: other_stack.append((y, 1))
 
-        if si.has_next(): return 1
-        if oi.has_next(): return -1
+        if self_stack: return 1
+        if other_stack: return -1
 
         return 0
