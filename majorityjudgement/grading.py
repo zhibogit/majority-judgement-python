@@ -80,6 +80,50 @@ def _calculate_judgement_trail(tallies):
                 break
     return judgement_trail
 
+def __append_cycle(result, h, xs,n):
+    if n <= 0: return h 
+    if not h:
+        if len(xs) == 2:
+            result.append((xs, n))
+        else:
+            x = xs[0]
+            result.append(((x,x),n/2))
+            if n % 2 != 0: h = x
+    else:
+        if len(xs) == 2:
+            result.append(((h, xs[0]), 1))
+            result.append(((h, xs), n-1))
+            h = xs[1]
+        else:
+            x = xs[0]
+            if x == h:
+                result.append((xs,n+1))
+            else:
+                result.append(((h,x), 1))
+                h = __append_cycle(result,h,xs,n-1)
+    return h
+                
+def _tupleize_cycle_list(cycles):
+    result = []
+    hangover = None
+    for xs, n in cycles:
+        hangover = __append_cycle(result,hangover, xs, n)             
+    if hangover:
+        result.append(([hangover], 1))
+
+    flattened_result = []
+    i = 0
+    while i < len(result):
+        j = i + 1
+        x = result[i][0]
+        n = result[i][1]
+        while j < len(result) and result[j][0] == x:
+            n += result[j][1]
+            j += 1
+        flattened_result.append((x,n))
+        i = j
+
+    return flattened_result
 
 class MajorityJudgement():
     """
@@ -99,7 +143,7 @@ class MajorityJudgement():
             if x < 0:
                 raise ValueError("Tally counts may not be negative: %s" % tally)
 
-        self._judgement_trail = _calculate_judgement_trail(tally)
+        self._judgement_trail = _tupleize_cycle_list(_calculate_judgement_trail(tally))
 
     def __repr__(self):
         return "MajorityJudgement(%s)" % (self._judgement_trail)
