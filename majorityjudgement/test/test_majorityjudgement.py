@@ -21,6 +21,16 @@ def naive_majority_judgement(tally):
 
     return result
     
+def seq_to_n(xs, n):
+    results = [[]]
+    for _ in xrange(n):
+        results = [r + [x] for r in results for x in xs]
+    return results
+
+def small_variations(xs):
+    for v in seq_to_n([-1,0,1], len(xs)):
+        if sum(v) == 0:
+            yield [x + p for (x,p) in zip(xs,v) if x + p >= 0]
 
 class TestMajorityJudgementSoundness:
     example_votes = [
@@ -61,6 +71,17 @@ class TestMajorityJudgementSoundness:
                 continue
             y[i-1] = y[i-1] + 1
             assert MajorityJudgement(y) < MajorityJudgement(x)
+
+    @on_all_examples
+    def test_small_variations_order_correctly(self, x):
+        xj = MajorityJudgement(x)
+        xnj = naive_majority_judgement(x)
+        for v in small_variations(x):
+            vj = MajorityJudgement(v)
+            vnj = naive_majority_judgement(v)
+            if vnj < xnj: assert vj < xj
+            elif vnj > xnj: assert vj > xj
+            else: assert vj == xj
 
     @on_all_examples
     def test_equality_of_same_input(self, x):
