@@ -1,5 +1,4 @@
 from majorityjudgement import MajorityJudgement
-from majorityjudgement.grading import _calculate_judgement_trail
 import pytest
 import re
 import operator
@@ -51,11 +50,6 @@ class TestMajorityJudgementSoundness:
     ]
 
     on_all_examples = pytest.mark.parametrize("x", example_votes)
-
-    @on_all_examples
-    def test_everything_makes_it_into_judgement(self,x):
-        jt = _calculate_judgement_trail(x)
-        assert sum(x) == sum((len(x) * n for (x, n) in jt))
 
     @on_all_examples
     def test_not_less_than_self(self, x):
@@ -141,17 +135,6 @@ class TestMajorityJudgementSoundness:
 
     def build_single_upvote(self, k, n):
         return [k] + [0 for _ in xrange(n-1)] + [1]
-
-    @pytest.mark.parametrize(("k", "n"), [
-        (10, 1),
-        (10, 5),
-        (10, 3),
-        (1, 1),
-        (2, 10)
-    ])
-    def test_single_upvote_comes_last(self, k, n):
-        x = MajorityJudgement(self.build_single_upvote(k, n))
-        assert x._judgement_trail[-2] == n or x._trailing_member == n
 
     @pytest.mark.parametrize(("k", "m", "n"), [
         (10, 1, 5),
