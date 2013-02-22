@@ -151,7 +151,7 @@ class TestMajorityJudgementSoundness:
     ])
     def test_single_upvote_comes_last(self, k, n):
         x = MajorityJudgement(self.build_single_upvote(k, n))
-        assert x._judgement_trail[-1][0][-1] == n
+        assert x._judgement_trail[-2] == n or x._trailing_member == n
 
     @pytest.mark.parametrize(("k", "m", "n"), [
         (10, 1, 5),

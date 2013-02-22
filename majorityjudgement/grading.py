@@ -108,8 +108,6 @@ def _tupleize_cycle_list(cycles):
     hangover = None
     for xs, n in cycles:
         hangover = __append_cycle(result,hangover, xs, n)             
-    if hangover:
-        result.append(([hangover], 1))
 
     flattened_result = []
     i = 0
@@ -120,10 +118,12 @@ def _tupleize_cycle_list(cycles):
         while j < len(result) and result[j][0] == x:
             n += result[j][1]
             j += 1
-        flattened_result.append((x,n))
+        flattened_result.append(x[0])
+        flattened_result.append(x[1])
+        flattened_result.append(n)
         i = j
 
-    return flattened_result
+    return flattened_result, hangover
 
 class MajorityJudgement():
     """
@@ -143,7 +143,10 @@ class MajorityJudgement():
             if x < 0:
                 raise ValueError("Tally counts may not be negative: %s" % tally)
 
-        self._judgement_trail = _tupleize_cycle_list(_calculate_judgement_trail(tally))
+        self._judgement_trail, self._trailing_member = _tupleize_cycle_list(_calculate_judgement_trail(tally))
+
+    def __nonzero__(self):
+        return bool(self._judgement_trail or self._trailing_member)
 
     def __repr__(self):
         return "MajorityJudgement(%s)" % (self._judgement_trail)
@@ -178,45 +181,46 @@ class MajorityJudgement():
         """
         if self is other:
             return 0
-        if not self._judgement_trail and not other._judgement_trail:
+        if not self and not other:
             return 0
-        if not self._judgement_trail:
+        if not self:
             return -1
-        if not other._judgement_trail:
+        if not other:
             return 1
 
-        self_stack = list(reversed(self._judgement_trail))
-        other_stack = list(reversed(other._judgement_trail))
+        self_list = list(self._judgement_trail)
+        other_list = list(other._judgement_trail)
 
-        while self_stack and other_stack:
-            x, xn = self_stack.pop()
-            y, yn = other_stack.pop()
+        self_index = 0
+        other_index = 0
 
-            m = min(xn, yn)
+        while self_index < len(self_list) and other_index < len(other_list):
+            if self_list[self_index] < other_list[other_index]: return -1
+            if self_list[self_index] > other_list[other_index]: return 1
+            if self_list[self_index+1] < other_list[other_index+1]: return -1
+            if self_list[self_index+1] > other_list[other_index+1]: return 1
 
-            if x[0] < y[0]:
+            m = min(self_list[self_index+2], other_list[other_index+2])
+
+            self_list[self_index+2] -= m
+            other_list[other_index+2] -= m
+
+            if not self_list[self_index+2]: self_index += 3
+            if not other_list[other_index+2]: other_index += 3
+
+
+        if other_index < len(other_list): return -1
+        if self_index < len(self_list): return 1
+
+        if self._trailing_member and other._trailing_member:
+            if self._trailing_member < other._trailing_member:
                 return -1
-            elif y[0] < x[0]:
+            if self._trailing_member > other._trailing_member:
                 return 1
-            elif len(x) == len(y):
-                if len(x) == 2:
-                    if x[1] < y[1]:
-                        return -1
-                    elif y[1] < x[1]:
-                        return 1
-            
-                if xn > yn:
-                    self_stack.append((x, xn - yn))
-                elif yn > xn:
-                    other_stack.append((y, yn - xn))
-            else:
-                if xn > 1: self_stack.append((x, xn - 1))
-                if yn > 1: other_stack.append((y, yn - 1))
-
-                if len(x) > 1: self_stack.append(([x[1]], 1))
-                else: other_stack.append(([y[1]], 1))
-
-        if self_stack: return 1
-        if other_stack: return -1
-
-        return 0
+            return 0
+        elif self._trailing_member:
+            return 1
+        elif other._trailing_member:
+            return -1
+        else:
+            return 0
