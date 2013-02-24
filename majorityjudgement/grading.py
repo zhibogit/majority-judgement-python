@@ -127,10 +127,12 @@ def _tupleize_cycle_list(cycles):
 
 class MajorityJudgement():
     """
-    Objects of type MajorityJudgement behave like a lazily evaluated frozen
-    list. They may be indexed, iterated over and _compared exactly as if they
-    were their list of majority judgement grades.
+    Objects of type MajorityJudgement wrap a list of tallies of underlying
+    votes, where grades are treated as numeric values from 0 to N for some N.
+    The may be compared for ordering and order as per the underlying voting 
+    algorithm.
     """
+
     def __init__(self, tally):
         """
         Create a MajorityJudgement object from a tally of grades. Note that
