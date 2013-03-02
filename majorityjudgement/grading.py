@@ -80,6 +80,38 @@ def _calculate_judgement_trail(tallies):
                 break
     return judgement_trail
 
+def retupleize_list(l):
+    print l
+    hangover = -1
+
+    result = []
+    
+    for xs, n in l:
+        if hangover < 0:
+            if len(xs) == 2:
+                result.append((tuple(xs), n))
+            else:
+                x = xs[0]
+                if n > 1: result.append(((x, x), n / 2))
+                if n % 2 != 0: hangover = x
+        else:
+            # I actually haven't reasoned through this bit yet.
+            # I think we can never have len(xs) == 2 here when the original
+            # total passed in is even. Certainly this seems to be true 
+            # empirically
+            assert len(xs) == 1
+            x = xs[0]
+            result.append(((hangover, x), 1))
+            n -= 1 
+            if n > 1: result.append(((x, x), n / 2))
+            if n % 2 != 0: hangover = x
+            else: hangover = -1
+
+    # We always feed an even total into here so there should never be a hangover
+    assert hangover < 0
+    print result
+    return result 
+    
 
 class MajorityJudgement():
     """
@@ -101,7 +133,8 @@ class MajorityJudgement():
             if x < 0:
                 raise ValueError("Tally counts may not be negative: %s" % tally)
 
-        self._judgement_trail = _calculate_judgement_trail(tally)
+        tally = [2 * x for x in tally]
+        self._judgement_trail = retupleize_list(_calculate_judgement_trail(tally))
 
     def __repr__(self):
         return "MajorityJudgement(%s)" % (self._judgement_trail)
@@ -152,27 +185,15 @@ class MajorityJudgement():
 
             m = min(xn, yn)
 
-            if x[0] < y[0]:
-                return -1
-            elif y[0] < x[0]:
-                return 1
-            elif len(x) == len(y):
-                if len(x) == 2:
-                    if x[1] < y[1]:
-                        return -1
-                    elif y[1] < x[1]:
-                        return 1
-            
-                if xn > yn:
-                    self_stack.append((x, xn - yn))
-                elif yn > xn:
-                    other_stack.append((y, yn - xn))
-            else:
-                if xn > 1: self_stack.append((x, xn - 1))
-                if yn > 1: other_stack.append((y, yn - 1))
+            assert len(x) == len(y) == 2
 
-                if len(x) > 1: self_stack.append(([x[1]], 1))
-                else: other_stack.append(([y[1]], 1))
+            if x < y: return -1
+            elif x > y: return 1
+
+            if xn > yn:
+                self_stack.append((x, xn - yn))
+            elif yn > xn:
+                other_stack.append((y, yn - xn))
 
         if self_stack: return 1
         if other_stack: return -1

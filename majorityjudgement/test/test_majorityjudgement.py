@@ -23,7 +23,6 @@ def naive_majority_judgement(tally):
     tally = list(tally)
     result = []
     tot = sum(tally)
-
     while tot:
         rt = 0
         for i in xrange(len(tally)):
@@ -33,7 +32,6 @@ def naive_majority_judgement(tally):
                 tally[i] -= 1
                 result.append(i)
                 break
-
     return result
     
 def seq_to_n(xs, n):
@@ -226,7 +224,7 @@ class TestMajorityJudgementSoundness:
                                       all_votes_of_size(7, 5),
                                       ])
     def test_on_all_small_examples(self, ev):
-        ev = [(MajorityJudgement(x), x) for x in ev]
+        ev = [(naive_majority_judgement(x), x) for x in ev]
         ev.sort()
         for i in xrange(0, len(ev) - 1):
-            assert naive_majority_judgement(ev[i][1]) < naive_majority_judgement(ev[i+1][1])
+            assert MajorityJudgement(ev[i][1]) < MajorityJudgement(ev[i+1][1])
