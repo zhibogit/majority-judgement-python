@@ -109,9 +109,6 @@ class MajorityJudgement():
         oi = 0
         
         while si < len(self_stack) and oi < len(other_stack):
-            print si, oi
-            print self_stack[si:si+3], other_stack[oi:oi+3]
-
             if self_stack[si] < other_stack[oi]: return -1
             elif self_stack[si] > other_stack[oi]: return 1
 
