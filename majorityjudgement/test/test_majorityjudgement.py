@@ -46,7 +46,11 @@ class TestMajorityJudgementSoundness:
         [10],
         [9],
         [10],
-        [9, 1]
+        [9, 1],
+        [11,10],
+        [0,1,0],
+        [0,0,1],
+        [1,0,0],
     ]
 
     on_all_examples = pytest.mark.parametrize("x", example_votes)
