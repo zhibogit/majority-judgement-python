@@ -3,6 +3,22 @@ import pytest
 import re
 import operator
 
+def all_votes_of_size(length, total):
+    if length <= 0:
+        yield []
+        return
+    if length == 1:
+        yield [total]
+        return
+    if total <= 0:
+        yield [0 for _ in xrange(length)]
+        return
+    for i in xrange(total):
+        x = [i]
+        for xs in all_votes_of_size(length - 1, total - i):
+            y = x + xs
+            yield y
+
 def naive_majority_judgement(tally):
     tally = list(tally)
     result = []
@@ -157,12 +173,19 @@ class TestMajorityJudgementSoundness:
         ([9, 1], [5, 5]),
         ([1, 1, 1, 1, 1], [0, 1, 1, 1, 2]),
         ([5, 5], [10, 10]),
-        ([0, 6, 6],[0, 8, 4]),
+        ([0, 8, 4], [0,6,6]),
     ])
 
 
     @order_tests 
     def test_puts_pairs_in_correct_order(self, x, y):
+        assert MajorityJudgement(x) < MajorityJudgement(y)
+
+    @order_tests
+    def test_doubling_preserves_order(self,x,y):
+        x = [2 * t for t in x]
+        y = [2 * t for t in y]
+        
         assert MajorityJudgement(x) < MajorityJudgement(y)
 
     @pytest.mark.parametrize(("ev"), [example_votes])
@@ -182,3 +205,10 @@ class TestMajorityJudgementSoundness:
         assert MajorityJudgement([]) == MajorityJudgement([])
         assert MajorityJudgement([]) < MajorityJudgement([1])
         assert MajorityJudgement([1]) > MajorityJudgement([])
+
+    @pytest.mark.parametrize(("ev"), [all_votes_of_size(3, 10),all_votes_of_size(5, 10)])
+    def test_on_all_small_examples(self, ev):
+        ev = [(MajorityJudgement(x), x) for x in ev]
+        ev.sort()
+        for i in xrange(0, len(ev) - 1):
+            assert naive_majority_judgement(ev[i][1]) < naive_majority_judgement(ev[i+1][1])
