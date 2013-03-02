@@ -221,7 +221,10 @@ class TestMajorityJudgementSoundness:
         assert MajorityJudgement([]) < MajorityJudgement([1])
         assert MajorityJudgement([1]) > MajorityJudgement([])
 
-    @pytest.mark.parametrize(("ev"), [all_votes_of_size(3, 10),all_votes_of_size(5, 10)])
+    @pytest.mark.parametrize(("ev"), [all_votes_of_size(3, 10),
+                                      all_votes_of_size(5, 10),
+                                      all_votes_of_size(7, 5),
+                                      ])
     def test_on_all_small_examples(self, ev):
         ev = [(MajorityJudgement(x), x) for x in ev]
         ev.sort()
