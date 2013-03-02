@@ -56,13 +56,14 @@ class MajorityJudgement():
                 raise ValueError("Tally counts must be integers: %s" % tally)
             if x < 0:
                 raise ValueError("Tally counts may not be negative: %s" % tally)
-
+        
+        self.tally = tally
         self.__judgement_trail = []
         self.__hangover = -1
-        self.__calculate_judgement_trail([2 * x for x in tally])
+        self.__calculate_judgement_trail()
 
     def __repr__(self):
-        return "MajorityJudgement(%s)" % str(self.__judgement_trail)
+        return "MajorityJudgement(tally=%s,judgement_trail=%s)" % (self.tally, self.__judgement_trail)
 
     def __eq__(self, other):
         return self.__judgement_trail == other.__judgement_trail
@@ -101,27 +102,31 @@ class MajorityJudgement():
         if not other.__judgement_trail:
             return 1
 
-        self_stack = list(reversed(self.__judgement_trail))
-        other_stack = list(reversed(other.__judgement_trail))
+        self_stack = list(self.__judgement_trail)
+        other_stack = list(other.__judgement_trail)
 
-        while self_stack and other_stack:
-            x, xn = self_stack.pop()
-            y, yn = other_stack.pop()
+        si = 0
+        oi = 0
+        
+        while si < len(self_stack) and oi < len(other_stack):
+            print si, oi
+            print self_stack[si:si+3], other_stack[oi:oi+3]
 
-            m = min(xn, yn)
+            if self_stack[si] < other_stack[oi]: return -1
+            elif self_stack[si] > other_stack[oi]: return 1
 
-            assert len(x) == len(y) == 2
+            if self_stack[si+1] < other_stack[oi+1]: return -1
+            elif self_stack[si+1] > other_stack[oi+1]: return 1
 
-            if x < y: return -1
-            elif x > y: return 1
+            m = min(self_stack[si+2], other_stack[oi+2])
+            self_stack[si+2] -= m
+            other_stack[oi+2] -= m
 
-            if xn > yn:
-                self_stack.append((x, xn - yn))
-            elif yn > xn:
-                other_stack.append((y, yn - xn))
+            if self_stack[si+2] == 0: si += 3
+            if other_stack[oi+2] == 0: oi += 3
 
-        if self_stack: return 1
-        if other_stack: return -1
+        if si < len(self_stack): return 1
+        if oi < len(other_stack): return -1
 
         return 0
 
@@ -129,7 +134,8 @@ class MajorityJudgement():
         return 1 + min(total - 2 * preceding - 1,
                        2 * preceding + 2 * votes - total)
     
-    def __calculate_judgement_trail(self, tallies):
+    def __calculate_judgement_trail(self):
+        tallies = [2 * x for x in self.tally]
         tallies_remaining = sum(tallies)
         while len(tallies) > 0:
             tot = 0
@@ -190,4 +196,7 @@ class MajorityJudgement():
             else: self.__hangover = -1
 
     def __simple_append(self,x,y,n):
-        self.__judgement_trail.append(((x,y),n))
+        self.__judgement_trail.append(x)
+        self.__judgement_trail.append(y)
+        self.__judgement_trail.append(n)
+        
