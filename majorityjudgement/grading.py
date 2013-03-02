@@ -81,7 +81,6 @@ def _calculate_judgement_trail(tallies):
     return judgement_trail
 
 def retupleize_list(l):
-    print l
     hangover = -1
 
     result = []
@@ -109,7 +108,6 @@ def retupleize_list(l):
 
     # We always feed an even total into here so there should never be a hangover
     assert hangover < 0
-    print result
     return result 
     
 
