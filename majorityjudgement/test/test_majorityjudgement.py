@@ -222,8 +222,10 @@ class TestMajorityJudgementSoundness:
     @pytest.mark.parametrize(("ev"), [all_votes_of_size(3, 10),
                                       all_votes_of_size(5, 10),
                                       all_votes_of_size(7, 5),
+                                      (list(all_votes_of_size(7, 5)) + list(all_votes_of_size(7, 7))),
+                                      (list(all_votes_of_size(7, 5)) + list(all_votes_of_size(3, 10))),
                                       ])
-    def test_on_all_small_examples(self, ev):
+    def test_sorts_all_small_examples_like_naive_version(self, ev):
         ev = [(naive_majority_judgement(x), x) for x in ev]
         ev.sort()
         for i in xrange(0, len(ev) - 1):
