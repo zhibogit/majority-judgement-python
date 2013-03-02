@@ -171,10 +171,10 @@ class MajorityJudgement():
     def __append(self,xs, n):
         if self.__hangover < 0:
             if len(xs) == 2:
-                self.__judgement_trail.append((tuple(xs), n))
+                self.__simple_append(xs[0],xs[1],n)
             else:
                 x = xs[0]
-                if n > 1: self.__judgement_trail.append(((x, x), n / 2))
+                if n > 1: self.__simple_append(x,x,n/2)
                 if n % 2 != 0: self.__hangover = x
         else:
             # I actually haven't reasoned through this bit yet.
@@ -183,8 +183,11 @@ class MajorityJudgement():
             # empirically
             assert len(xs) == 1
             x = xs[0]
-            self.__judgement_trail.append(((self.__hangover, x), 1))
+            self.__simple_append(self.__hangover, x, 1)
             n -= 1 
-            if n > 1: self.__judgement_trail.append(((x, x), n / 2))
+            if n > 1: self.__simple_append(x,x,n/2)
             if n % 2 != 0: self.__hangover = x
             else: self.__hangover = -1
+
+    def __simple_append(self,x,y,n):
+        self.__judgement_trail.append(((x,y),n))
