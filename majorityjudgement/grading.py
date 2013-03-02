@@ -76,11 +76,10 @@ def _calculate_judgement_trail(tallies):
                 while len(tallies) > 0 and tallies[-1] <= 0:
                     tallies.pop()
                 r = [relevant_indices, k]
-                judgement_trail.append(r)
+                yield r
                 break
-    return judgement_trail
 
-def retupleize_list(l):
+def _retupleize_list(l):
     hangover = -1
 
     result = []
@@ -132,7 +131,7 @@ class MajorityJudgement():
                 raise ValueError("Tally counts may not be negative: %s" % tally)
 
         tally = [2 * x for x in tally]
-        self._judgement_trail = retupleize_list(_calculate_judgement_trail(tally))
+        self._judgement_trail = _retupleize_list(_calculate_judgement_trail(tally))
 
     def __repr__(self):
         return "MajorityJudgement(%s)" % (self._judgement_trail)
