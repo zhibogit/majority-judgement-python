@@ -39,9 +39,9 @@ import copy
 
 class MajorityJudgement():
     """
-    Objects of type MajorityJudgement behave like a lazily evaluated frozen
-    list. They may be indexed, iterated over and _compared exactly as if they
-    were their list of majority judgement grades.
+    Objects of type MajorityJudgement support comparison and ordering options 
+    as per the ordering of the described voting algorithm. They expose no other
+    operations.
     """
     def __init__(self, tally):
         """
