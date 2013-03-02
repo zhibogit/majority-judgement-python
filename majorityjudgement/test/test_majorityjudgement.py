@@ -159,6 +159,11 @@ class TestMajorityJudgementSoundness:
         ([5, 5], [10, 10])
     ])
 
+
+    @order_tests 
+    def test_puts_pairs_in_correct_order(self, x, y):
+        assert MajorityJudgement(x) < MajorityJudgement(y)
+
     @pytest.mark.parametrize(("ev"), [example_votes])
     def test_sorts_like_corresponding_lists(self, ev):
         blah = [ (i, MajorityJudgement(x), 
