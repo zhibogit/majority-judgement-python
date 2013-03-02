@@ -4,3 +4,4 @@ v0.1.0, 17/02/2013 -- Switch to more sophisticated algorithm that better run len
 v0.1.1, 18/02/2013 -- Significant improvement of behaviour in the presence of cycles of length 2.
 v0.1.2, 18/02/2013 -- Improved compression of the resulting list. Make behaviour more collection like.
 v0.2.0, 20/02/2013 -- Implementation no longer lazily evaluates judgement trail as they're always really short. Simplified code.
+v0.3.0, 20/02/2013 -- Greatly stripped down API - just implement the basic comparison operations. Also significantly improved implementation.
