@@ -85,13 +85,11 @@ class MajorityJudgement():
 
     def _compare(self, other):
         """
-            Return an integer expressing the order relation between self and
-            other. -1 if self < other, 0 if self == other, 1 if self > other.
+        Return an integer expressing the order relation between self and
+        other. -1 if self < other, 0 if self == other, 1 if self > other.
 
-            Ordering is defined to be equivalent to lexicographical ordering of
-            list(self) and list(other), but may not fully evaluate the sequence
-            and may require less iteration due to long stretches of common
-            values.
+        The ordering relationship is defined by the majority judgement 
+        voting order
         """
         if self is other:
             return 0
