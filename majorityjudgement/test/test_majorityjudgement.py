@@ -216,6 +216,7 @@ class TestMajorityJudgementSoundness:
                  naive_majority_judgement(x)) 
                  for i, x in zip(range(len(ev)),ev)]
 
+
         assert sorted(blah,key=operator.itemgetter(1)) == sorted(blah,key=operator.itemgetter(2))
 
     @on_all_examples

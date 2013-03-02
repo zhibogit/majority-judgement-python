@@ -130,48 +130,56 @@ class MajorityJudgement():
     def __how_many_to_pop(self, preceding, votes, total):
         return 1 + min(total - 2 * preceding - 1,
                        2 * preceding + 2 * votes - total)
-    
+   
+    def __medians(self, tallies):
+        tallies_remaining = sum(tallies)
+        tot = 0
+        for i in xrange(len(tallies)):  # pragma: no branch
+            preceding = tot
+            v = tallies[i]
+            tot += v
+            if 2 * tot >= tallies_remaining:
+                if 2 * tot == tallies_remaining:
+                    next_index = i+1
+                    while not tallies[next_index]:
+                        next_index += 1
+                    return i, next_index
+                else:
+                    return i, i
+
+ 
     def __calculate_judgement_trail(self):
         tallies = [2 * x for x in self.tally]
         tallies_remaining = sum(tallies)
         while len(tallies) > 0:
-            tot = 0
-            for i in xrange(len(tallies)):  # pragma: no branch
-                preceding = tot
-                v = tallies[i]
-                tot += v
-                if 2 * tot >= tallies_remaining:
-                    if 2 * tot == tallies_remaining:
-                        next_index = i+1
-                        while not tallies[next_index]:
-                            next_index += 1
+            lm,um = self.__medians(tallies)
+             
+            votes_to_pop = (
+                self.__how_many_to_pop(sum((tallies[i] for i in xrange(lm))),
+                                       sum((tallies[i] for i in xrange(lm,um+1))),
+                                       sum(tallies)))
 
-                        relevant_indices = [i, next_index]
-                        votes_to_pop = self.__how_many_to_pop(preceding,
-                                                              v + tallies[next_index],
-                                                              tallies_remaining)
-                        k = votes_to_pop / 2
-                        votes_to_pop = k * 2
-                    else:
-                        relevant_indices = [i]
-                        votes_to_pop = self.__how_many_to_pop(preceding,
-                                                              v,
-                                                              tallies_remaining)
-                        k = votes_to_pop
+            if lm != um:
+                relevant_indices = [lm, um]
+                k = votes_to_pop / 2
+                votes_to_pop = k * 2
+            else:
+                relevant_indices = [lm]
+                k = votes_to_pop
 
-                    tallies_remaining -= votes_to_pop
-                    for i in relevant_indices:
-                        tallies[i] -= k
+            for i in relevant_indices:
+                tallies[i] -= k
 
-                    while len(tallies) > 0 and tallies[-1] <= 0:
-                        tallies.pop()
-                    self.__append(relevant_indices, k)
-                    break
+            while len(tallies) > 0 and tallies[-1] <= 0:
+                tallies.pop()
+            self.__append(relevant_indices, k)
+            break
 
         assert self.__hangover < 0
         self.__judgement_trail = tuple(self.__judgement_trail)
 
     def __append(self,xs, n):
+        print self.__hangover
         if self.__hangover < 0:
             if len(xs) == 2:
                 self.__simple_append(xs[0],xs[1],n)
