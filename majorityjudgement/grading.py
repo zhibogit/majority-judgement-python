@@ -96,6 +96,8 @@ class MajorityJudgement():
         """
 
         for x in tally:
+            if type(x) is not int:
+                raise ValueError("Tally counts must be integers: %s" % tally)
             if x < 0:
                 raise ValueError("Tally counts may not be negative: %s" % tally)
 

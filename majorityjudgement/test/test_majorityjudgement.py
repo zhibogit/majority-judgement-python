@@ -71,6 +71,21 @@ class TestMajorityJudgementSoundness:
 
     on_all_examples = pytest.mark.parametrize("x", example_votes)
 
+    def test_input_validation_non_negative(self):
+        with pytest.raises(ValueError) as exinfo:
+            MajorityJudgement([-1, 2])
+
+        assert re.search("negative", exinfo.value.message)
+
+    def test_input_validation_integer(self):
+        with pytest.raises(ValueError) as exinfo:
+            MajorityJudgement([[]])
+        assert re.search("integer", exinfo.value.message)
+
+        with pytest.raises(ValueError) as exinfo:
+            MajorityJudgement([-1.0])
+        assert re.search("integer", exinfo.value.message)
+
     @on_all_examples
     def test_not_less_than_self(self, x):
         assert MajorityJudgement(x) >= MajorityJudgement(x)
