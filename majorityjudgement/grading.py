@@ -36,79 +36,6 @@ procedure by assigning each candidate their tally and taking the maximum.
 import collections
 import copy
 
-def _how_many_to_pop(preceding, votes, total):
-    return 1 + min(total - 2 * preceding - 1,
-                   2 * preceding + 2 * votes - total)
-
-def _calculate_judgement_trail(tallies):
-    judgement_trail = []
-    tallies = list(tallies)
-    tallies_remaining = sum(tallies)
-    while len(tallies) > 0:
-        tot = 0
-        for i in xrange(len(tallies)):  # pragma: no branch
-            preceding = tot
-            v = tallies[i]
-            tot += v
-            if 2 * tot >= tallies_remaining:
-                if 2 * tot == tallies_remaining:
-                    next_index = i+1
-                    while not tallies[next_index]:
-                        next_index += 1
-
-                    relevant_indices = [i, next_index]
-                    votes_to_pop = _how_many_to_pop(preceding,
-                                                    v + tallies[next_index],
-                                                    tallies_remaining)
-                    k = votes_to_pop / 2
-                    votes_to_pop = k * 2
-                else:
-                    relevant_indices = [i]
-                    votes_to_pop = _how_many_to_pop(preceding,
-                                                    v,
-                                                    tallies_remaining)
-                    k = votes_to_pop
-
-                tallies_remaining -= votes_to_pop
-                for i in relevant_indices:
-                    tallies[i] -= k
-
-                while len(tallies) > 0 and tallies[-1] <= 0:
-                    tallies.pop()
-                r = [relevant_indices, k]
-                yield r
-                break
-
-def _retupleize_list(l):
-    hangover = -1
-
-    result = []
-    
-    for xs, n in l:
-        if hangover < 0:
-            if len(xs) == 2:
-                result.append((tuple(xs), n))
-            else:
-                x = xs[0]
-                if n > 1: result.append(((x, x), n / 2))
-                if n % 2 != 0: hangover = x
-        else:
-            # I actually haven't reasoned through this bit yet.
-            # I think we can never have len(xs) == 2 here when the original
-            # total passed in is even. Certainly this seems to be true 
-            # empirically
-            assert len(xs) == 1
-            x = xs[0]
-            result.append(((hangover, x), 1))
-            n -= 1 
-            if n > 1: result.append(((x, x), n / 2))
-            if n % 2 != 0: hangover = x
-            else: hangover = -1
-
-    # We always feed an even total into here so there should never be a hangover
-    assert hangover < 0
-    return result 
-    
 
 class MajorityJudgement():
     """
@@ -130,11 +57,12 @@ class MajorityJudgement():
             if x < 0:
                 raise ValueError("Tally counts may not be negative: %s" % tally)
 
-        tally = [2 * x for x in tally]
-        self._judgement_trail = _retupleize_list(_calculate_judgement_trail(tally))
+        self.__judgement_trail = []
+        self.__hangover = -1
+        self.__calculate_judgement_trail([2 * x for x in tally])
 
     def __repr__(self):
-        return "MajorityJudgement(%s)" % (self._judgement_trail)
+        return "MajorityJudgement(%s)" % str(self.__judgement_trail)
 
     def __eq__(self, other):
         return self._compare(other) == 0
@@ -166,15 +94,15 @@ class MajorityJudgement():
         """
         if self is other:
             return 0
-        if not self._judgement_trail and not other._judgement_trail:
+        if not self.__judgement_trail and not other.__judgement_trail:
             return 0
-        if not self._judgement_trail:
+        if not self.__judgement_trail:
             return -1
-        if not other._judgement_trail:
+        if not other.__judgement_trail:
             return 1
 
-        self_stack = list(reversed(self._judgement_trail))
-        other_stack = list(reversed(other._judgement_trail))
+        self_stack = list(reversed(self.__judgement_trail))
+        other_stack = list(reversed(other.__judgement_trail))
 
         while self_stack and other_stack:
             x, xn = self_stack.pop()
@@ -196,3 +124,67 @@ class MajorityJudgement():
         if other_stack: return -1
 
         return 0
+
+    def __how_many_to_pop(self, preceding, votes, total):
+        return 1 + min(total - 2 * preceding - 1,
+                       2 * preceding + 2 * votes - total)
+    
+    def __calculate_judgement_trail(self, tallies):
+        tallies_remaining = sum(tallies)
+        while len(tallies) > 0:
+            tot = 0
+            for i in xrange(len(tallies)):  # pragma: no branch
+                preceding = tot
+                v = tallies[i]
+                tot += v
+                if 2 * tot >= tallies_remaining:
+                    if 2 * tot == tallies_remaining:
+                        next_index = i+1
+                        while not tallies[next_index]:
+                            next_index += 1
+
+                        relevant_indices = [i, next_index]
+                        votes_to_pop = self.__how_many_to_pop(preceding,
+                                                              v + tallies[next_index],
+                                                              tallies_remaining)
+                        k = votes_to_pop / 2
+                        votes_to_pop = k * 2
+                    else:
+                        relevant_indices = [i]
+                        votes_to_pop = self.__how_many_to_pop(preceding,
+                                                              v,
+                                                              tallies_remaining)
+                        k = votes_to_pop
+
+                    tallies_remaining -= votes_to_pop
+                    for i in relevant_indices:
+                        tallies[i] -= k
+
+                    while len(tallies) > 0 and tallies[-1] <= 0:
+                        tallies.pop()
+                    self.__append(relevant_indices, k)
+                    break
+
+        assert self.__hangover < 0
+        self.__judgement_trail = tuple(self.__judgement_trail)
+
+    def __append(self,xs, n):
+        if self.__hangover < 0:
+            if len(xs) == 2:
+                self.__judgement_trail.append((tuple(xs), n))
+            else:
+                x = xs[0]
+                if n > 1: self.__judgement_trail.append(((x, x), n / 2))
+                if n % 2 != 0: self.__hangover = x
+        else:
+            # I actually haven't reasoned through this bit yet.
+            # I think we can never have len(xs) == 2 here when the original
+            # total passed in is even. Certainly this seems to be true 
+            # empirically
+            assert len(xs) == 1
+            x = xs[0]
+            self.__judgement_trail.append(((self.__hangover, x), 1))
+            n -= 1 
+            if n > 1: self.__judgement_trail.append(((x, x), n / 2))
+            if n % 2 != 0: self.__hangover = x
+            else: self.__hangover = -1
