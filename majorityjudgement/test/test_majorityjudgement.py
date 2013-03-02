@@ -116,8 +116,17 @@ class TestMajorityJudgementSoundness:
         assert x == x
 
     @on_all_examples
+    def test_greater_equal_same_input(self,x):
+        x = MajorityJudgement(x)
+        assert x >= x
+        
+    @on_all_examples
     def test_equality_of_identical_inputs(self, x):
         assert MajorityJudgement(x) == MajorityJudgement(x)
+
+    @on_all_examples
+    def test_greater_equal_identical_inputs(self, x):
+        assert MajorityJudgement(x) >= MajorityJudgement(x)
 
     @pytest.mark.parametrize(("x", "y"), [
         (x, y) for x in example_votes for y in example_votes if x != y
@@ -216,6 +225,7 @@ class TestMajorityJudgementSoundness:
 
     def test_empty_behaviour(self):
         assert MajorityJudgement([]) == MajorityJudgement([])
+        assert MajorityJudgement([]) >= MajorityJudgement([])
         assert MajorityJudgement([]) < MajorityJudgement([1])
         assert MajorityJudgement([1]) > MajorityJudgement([])
 

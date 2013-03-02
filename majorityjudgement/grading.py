@@ -65,10 +65,10 @@ class MajorityJudgement():
         return "MajorityJudgement(%s)" % str(self.__judgement_trail)
 
     def __eq__(self, other):
-        return self._compare(other) == 0
+        return self.__judgement_trail == other.__judgement_trail
 
     def __ne__(self, other):
-        return self._compare(other) != 0
+        return self.__judgement_trail != other.__judgement_trail
 
     def __lt__(self, other):
         return self._compare(other) < 0
